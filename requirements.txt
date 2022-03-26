@@ -1,4 +1,5 @@
 fastapi==0.75.*
+uvicorn==0.17.*
 pymongo==4.0.*
 black
 isort

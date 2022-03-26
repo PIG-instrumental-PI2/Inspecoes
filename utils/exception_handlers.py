@@ -25,12 +25,13 @@ class ExceptionHandler(Exception):
     """Class to handle known exceptions"""
 
     @staticmethod
-    async def exception_handler(request: Request, ex: BaseCustomException):
+    def exception_handler(request: Request, ex: BaseCustomException):
         try:
             status_code = ex.status_code
             error_message = ex.message
-        except Exception:
-            error_message = "An unexpected error occurred"
+        except Exception as ex:
+            print(ex)
+            error_message = "Ocorreu um erro inesperado"
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
         response = {"error": error_message}

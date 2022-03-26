@@ -6,7 +6,7 @@ services:
     hostname: pig-inspections-mongodb
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
     volumes:
       - pig-inspections-mongodb-data:/data/db
     networks:
@@ -16,9 +16,9 @@ services:
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongo pig-inspections-mongodb:27017/test --quiet
       interval: 30s
-      timeout: 10s
+      timeout: 20s
       retries: 3
-    restart: unless-stopped
+    restart: on-failure
 
   pig-inspections-mongo-express:
     image: mongo-express
@@ -27,7 +27,7 @@ services:
       - ME_CONFIG_MONGODB_SERVER=pig-inspections-mongodb
       - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
       - ME_CONFIG_MONGODB_ADMINUSERNAME=root
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
       - ME_CONFIG_BASICAUTH_USERNAME=admin
       - ME_CONFIG_BASICAUTH_PASSWORD=admin
     volumes:
@@ -41,31 +41,31 @@ services:
     healthcheck:
       test: wget --quiet --tries=3 --spider http://admin:admin123@10.10.10.60:8081 || exit 1
       interval: 30s
-      timeout: 10s
+      timeout: 20s
       retries: 3
-    restart: unless-stopped
+    restart: on-failure
 
-  pig-inspections:
-    container_name: pig-inspections
-    restart: unless-stopped
-    hostname: pig-inspections
-    build: .
-    image: pig-inspections
-    environment:
-      ALLOWED_HOSTS: "*"
-      PIG_INSPECTIONS_DB_HOST: pig-inspections-mongodb
-      PIG_INSPECTIONS_DB_PORT: 27017
-      PIG_INSPECTIONS_DB_USER: root
-      PIG_INSPECTIONS_DB_PASS: root
-      PIG_INSPECTIONS_DB_NAME: pig-inspections
-    command: ["make", "install", "run"]
-    ports:
-      - 8080:8080
-    networks:
-      - pig-network
-    volumes:
-      - .:/app
-      - pip-cache:/usr/local/lib/python3.8/site-packages
+  # pig-inspections-api:
+  #   container_name: pig-inspections-api
+  #   restart: on-failure
+  #   hostname: pig-inspections
+  #   build: .
+  #   image: pig-inspections
+  #   environment:
+  #     ALLOWED_HOSTS: "*"
+  #     PIG_INSPECTIONS_DB_HOST: pig-inspections-mongodb
+  #     PIG_INSPECTIONS_DB_PORT: 27017
+  #     PIG_INSPECTIONS_DB_USER: root
+  #     PIG_INSPECTIONS_DB_PASS: password
+  #     PIG_INSPECTIONS_DB_NAME: pig-inspections
+  #   command: ["make", "install", "run"]
+  #   ports:
+  #     - 8080:8080
+  #   networks:
+  #     - pig-network
+  #   volumes:
+  #     - .:/app
+  #     - pip-cache:/usr/local/lib/python3.8/site-packages
 
 volumes:
   pig-inspections-mongodb-data:
