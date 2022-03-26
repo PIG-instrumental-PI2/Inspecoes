@@ -1,0 +1,79 @@
+version: "3.5"
+services:
+  pig-inspections-mongodb:
+    image: mongo
+    container_name: pig-inspections-mongodb
+    hostname: pig-inspections-mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    volumes:
+      - pig-inspections-mongodb-data:/data/db
+    networks:
+      - pig-network
+    ports:
+      - 27017:27017
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo pig-inspections-mongodb:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  pig-inspections-mongo-express:
+    image: mongo-express
+    container_name: pig-inspections-mongo-express
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=pig-inspections-mongodb
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=root
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    volumes:
+      - pig-inspections-mongodb-data
+    depends_on:
+      - pig-inspections-mongodb
+    networks:
+      - pig-network
+    ports:
+      - 8081:8081
+    healthcheck:
+      test: wget --quiet --tries=3 --spider http://admin:admin123@10.10.10.60:8081 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  pig-inspections:
+    container_name: pig-inspections
+    restart: unless-stopped
+    hostname: pig-inspections
+    build: .
+    image: pig-inspections
+    environment:
+      ALLOWED_HOSTS: "*"
+      PIG_INSPECTIONS_DB_HOST: pig-inspections-mongodb
+      PIG_INSPECTIONS_DB_PORT: 27017
+      PIG_INSPECTIONS_DB_USER: root
+      PIG_INSPECTIONS_DB_PASS: root
+      PIG_INSPECTIONS_DB_NAME: pig-inspections
+    command: ["make", "install", "run"]
+    ports:
+      - 8080:8080
+    networks:
+      - pig-network
+    volumes:
+      - .:/app
+      - pip-cache:/usr/local/lib/python3.8/site-packages
+
+volumes:
+  pig-inspections-mongodb-data:
+    name: pig-inspections-mongodb-data
+  pip-cache:
+    name: pig-inspections-pip-cache
+
+networks:
+  pig-network:
+    name: pig-network
+    driver: bridge

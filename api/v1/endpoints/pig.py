@@ -1,5 +1,4 @@
-from fastapi import APIRouter
-from fastapi import status
+from fastapi import APIRouter, status
 
 from schemas.requests.pig import PIGCreationRequest
 from schemas.responses.pig import PIGRecordResponse
