@@ -45,27 +45,28 @@ services:
       retries: 3
     restart: on-failure
 
-  # pig-inspections-api:
-  #   container_name: pig-inspections-api
-  #   restart: on-failure
-  #   hostname: pig-inspections
-  #   build: .
-  #   image: pig-inspections
-  #   environment:
-  #     ALLOWED_HOSTS: "*"
-  #     PIG_INSPECTIONS_DB_HOST: pig-inspections-mongodb
-  #     PIG_INSPECTIONS_DB_PORT: 27017
-  #     PIG_INSPECTIONS_DB_USER: root
-  #     PIG_INSPECTIONS_DB_PASS: password
-  #     PIG_INSPECTIONS_DB_NAME: pig-inspections
-  #   command: ["make", "install", "run"]
-  #   ports:
-  #     - 8080:8080
-  #   networks:
-  #     - pig-network
-  #   volumes:
-  #     - .:/app
-  #     - pip-cache:/usr/local/lib/python3.8/site-packages
+  pig-inspections-api:
+    container_name: pig-inspections-api
+    restart: on-failure
+    hostname: pig-inspections
+    build: .
+    image: pig-inspections
+    environment:
+      ALLOWED_HOSTS: "*"
+      PIG_INSPECTIONS_DB_HOST: pig-inspections-mongodb
+      PIG_INSPECTIONS_DB_PORT: 27017
+      PIG_INSPECTIONS_DB_USER: root
+      PIG_INSPECTIONS_DB_PASS: password
+      PIG_INSPECTIONS_DB_NAME: pig-inspections
+    command: ["make", "install", "run-debug"]
+    ports:
+      - 8080:8080
+      - 5678:5678
+    networks:
+      - pig-network
+    volumes:
+      - .:/app
+      - pip-cache:/usr/local/lib/python3.8/site-packages
 
 volumes:
   pig-inspections-mongodb-data:

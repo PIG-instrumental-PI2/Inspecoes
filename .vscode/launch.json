@@ -5,33 +5,31 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: FastAPI Server",
+      "name": "Docker FastAPI Debug",
       "type": "python",
-      "request": "launch",
-      "module": "uvicorn",
-      "env": {
-        "PIG_INSPECTIONS_DB_HOST": "localhost",
-        "PIG_INSPECTIONS_DB_PORT": "27017",
-        "PIG_INSPECTIONS_DB_USER": "root",
-        "PIG_INSPECTIONS_DB_PASS": "password",
-        "PIG_INSPECTIONS_DB_NAME": "pig-inspections"
-      },
-      // "envFile": "${workspaceFolder}/.env",
-      "args": ["main:app", "--port", "8080", "--reload"],
-      "jinja": false
-    }
+      "request": "attach",
+      "host": "0.0.0.0",
+      "port": 5678,
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}",
+          "remoteRoot": "/app"
+        }
+      ]
+    },
     // {
-    //   "name": "Remote Python: FastAPI",
+    //   "name": "Local FastAPI Debug",
     //   "type": "python",
-    //   "request": "attach",
-    //   "host": "localhost",
-    //   "port": 8080,
-    //   "pathMappings": [
-    //     {
-    //       "localRoot": "${workspaceFolder}",
-    //       "remoteRoot": "/app"
-    //     }
-    //   ]
-    // }
+    //   "request": "launch",
+    //   "module": "uvicorn",
+    //   "env": {
+    //     "PIG_INSPECTIONS_DB_HOST": "localhost",
+    //     "PIG_INSPECTIONS_DB_PORT": "27017",
+    //     "PIG_INSPECTIONS_DB_USER": "root",
+    //     "PIG_INSPECTIONS_DB_PASS": "password",
+    //     "PIG_INSPECTIONS_DB_NAME": "pig-inspections"
+    //   },
+    //   "args": ["main:app", "--port", "8080", "--reload"],
+    // },
   ]
 }
