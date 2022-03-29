@@ -38,6 +38,7 @@ class PIGRepository:
 
         return PIGModel(
             id=str(record.get("_id")),
+            pig_number=record.get("pig_number"),
             name=record.get("name"),
             company_id=record.get("company_id"),
             description=record.get("description"),

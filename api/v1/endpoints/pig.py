@@ -10,12 +10,14 @@ router = APIRouter()
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=PIGResponse)
 def create_pig(pig_body: PIGCreationRequest):
     pig_record = PIGService().create(
+        serial_number=pig_body.pig_number,
         name=pig_body.name,
         company=pig_body.company_id,
         description=pig_body.description,
     )
     return PIGResponse(
         id=pig_record.id,
+        pig_number=pig_record.pig_number,
         name=pig_record.name,
         company_id=pig_record.company_id,
         description=pig_record.description,
@@ -30,6 +32,7 @@ def get_pigs(company_id: str):
         pigs_reponse.append(
             PIGResponse(
                 id=pig_record.id,
+                pig_number=pig_record.pig_number,
                 name=pig_record.name,
                 company_id=pig_record.company_id,
                 description=pig_record.description,
@@ -45,6 +48,7 @@ def get_pig(pig_id: str):
 
     return PIGResponse(
         id=pig_record.id,
+        pig_number=pig_record.pig_number,
         name=pig_record.name,
         company_id=pig_record.company_id,
         description=pig_record.description,
@@ -62,6 +66,7 @@ def update_pig(pig_id: str, pig_body: PIGUpdateRequest):
 
     return PIGResponse(
         id=pig_record.id,
+        pig_number=pig_record.pig_number,
         name=pig_record.name,
         company_id=pig_record.company_id,
         description=pig_record.description,

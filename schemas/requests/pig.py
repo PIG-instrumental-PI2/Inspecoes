@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class PIGCreationRequest(BaseModel):
     name: str
+    pig_number: str
     company_id: str
     description: Optional[str]
 

@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class PIGResponse(BaseModel):
     id: str
+    pig_number: str
     name: str
     company_id: str
     description: Optional[str]
