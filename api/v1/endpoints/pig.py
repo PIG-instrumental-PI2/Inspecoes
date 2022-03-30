@@ -1,7 +1,9 @@
+from typing import List, Optional
+
 from fastapi import APIRouter, status
 
 from schemas.requests.pig import PIGCreationRequest, PIGUpdateRequest
-from schemas.responses.pig import PIGDeleteResponse, PIGListResponse, PIGResponse
+from schemas.responses.pig import PIGDeleteResponse, PIGResponse
 from services.pig import PIGService
 
 router = APIRouter()
@@ -24,7 +26,7 @@ def create_pig(pig_body: PIGCreationRequest):
     )
 
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=PIGListResponse)
+@router.get("/", status_code=status.HTTP_200_OK, response_model=List[PIGResponse])
 def get_pigs(company_id: str):
     pig_records = PIGService().get_all_by_company(company=company_id)
     pigs_reponse = []
@@ -39,10 +41,12 @@ def get_pigs(company_id: str):
             )
         )
 
-    return PIGListResponse(pigs=pigs_reponse)
+    return pigs_reponse
 
 
-@router.get("/{pig_id}", status_code=status.HTTP_200_OK, response_model=PIGResponse)
+@router.get(
+    "/{pig_id}", status_code=status.HTTP_200_OK, response_model=Optional[PIGResponse]
+)
 def get_pig(pig_id: str):
     pig_record = PIGService().get_by_id(pig_id=pig_id)
 

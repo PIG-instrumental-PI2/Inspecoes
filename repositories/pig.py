@@ -1,7 +1,8 @@
-from typing import List
+from typing import List, Optional
 
 from libraries.mongodb_client import DatabaseClient
 from models.pig import PIGModel
+from utils.exception_handlers import NotFoundException
 
 
 class PIGRepository:
@@ -26,6 +27,7 @@ class PIGRepository:
             records.append(
                 PIGModel(
                     id=str(record.get("_id")),
+                    pig_number=record.get("pig_number"),
                     name=record.get("name"),
                     company_id=record.get("company_id"),
                     description=record.get("description"),
@@ -36,13 +38,16 @@ class PIGRepository:
     def get_by_id(self, pig_id: str) -> PIGModel:
         record = self._db_client.get(query={"_id": pig_id})
 
-        return PIGModel(
-            id=str(record.get("_id")),
-            pig_number=record.get("pig_number"),
-            name=record.get("name"),
-            company_id=record.get("company_id"),
-            description=record.get("description"),
-        )
+        if record:
+            return PIGModel(
+                id=str(record.get("_id")),
+                pig_number=record.get("pig_number"),
+                name=record.get("name"),
+                company_id=record.get("company_id"),
+                description=record.get("description"),
+            )
+        else:
+            raise NotFoundException("Resource Not Found")
 
     def delete(self, pig_id: str):
         self._db_client.delete(query={"_id": pig_id})

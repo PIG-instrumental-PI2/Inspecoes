@@ -11,10 +11,6 @@ class PIGResponse(BaseModel):
     description: Optional[str]
 
 
-class PIGListResponse(BaseModel):
-    pigs: List[PIGResponse]
-
-
 class PIGDeleteResponse(BaseModel):
     id: str
     status = "deleted"

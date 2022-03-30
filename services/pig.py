@@ -8,8 +8,15 @@ class PIGService:
     def __init__(self) -> None:
         self._pig_repository = PIGRepository()
 
-    def create(self, serial_number: str, name: str, company: str, description: str = None) -> PIGModel:
-        pig_document = PIGModel(pig_number=serial_number, name=name, company_id=company, description=description)
+    def create(
+        self, serial_number: str, name: str, company: str, description: str = None
+    ) -> PIGModel:
+        pig_document = PIGModel(
+            pig_number=serial_number,
+            name=name,
+            company_id=company,
+            description=description,
+        )
         return self._pig_repository.save(pig_document)
 
     def update(

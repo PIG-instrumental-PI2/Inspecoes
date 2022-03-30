@@ -15,21 +15,39 @@
           "localRoot": "${workspaceFolder}",
           "remoteRoot": "/app"
         }
-      ]
+      ],
+      "justMyCode": false
     },
-    // {
-    //   "name": "Local FastAPI Debug",
-    //   "type": "python",
-    //   "request": "launch",
-    //   "module": "uvicorn",
-    //   "env": {
-    //     "PIG_INSPECTIONS_DB_HOST": "localhost",
-    //     "PIG_INSPECTIONS_DB_PORT": "27017",
-    //     "PIG_INSPECTIONS_DB_USER": "root",
-    //     "PIG_INSPECTIONS_DB_PASS": "password",
-    //     "PIG_INSPECTIONS_DB_NAME": "pig-inspections"
-    //   },
-    //   "args": ["main:app", "--port", "8080", "--reload"],
-    // },
+    {
+      "name": "Local FastAPI Debug",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "env": {
+        "PIG_INSPECTIONS_DB_HOST": "localhost",
+        "PIG_INSPECTIONS_DB_PORT": "27017",
+        "PIG_INSPECTIONS_DB_USER": "root",
+        "PIG_INSPECTIONS_DB_PASS": "password",
+        "PIG_INSPECTIONS_DB_NAME": "pig-inspections"
+      },
+      "args": ["main:app", "--port", "8080", "--reload"],
+      "justMyCode": false
+    },
+    {
+      "name": "FastAPI Testing",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/venv/bin/pytest",
+      "env": {
+        "PIG_INSPECTIONS_DB_HOST": "localhost",
+        "PIG_INSPECTIONS_DB_PORT": "27017",
+        "PIG_INSPECTIONS_DB_USER": "root",
+        "PIG_INSPECTIONS_DB_PASS": "password",
+        "PIG_INSPECTIONS_DB_NAME": "pig-inspections"
+      },
+      "console": "integratedTerminal",
+      "args": ["tests/pig/test_pig_get_single.py"],
+      "justMyCode": false
+    }
   ]
 }

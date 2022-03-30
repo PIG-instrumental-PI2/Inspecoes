@@ -98,5 +98,7 @@ class DatabaseClient:
         return self._collection.count(query)
 
     def _handle_id(self, str_id: str):
-        if str_id:
+        try:
             return ObjectId(str_id)
+        except:
+            return None
