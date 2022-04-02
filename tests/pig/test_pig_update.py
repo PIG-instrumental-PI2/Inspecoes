@@ -36,7 +36,7 @@ def pig_mongo_mock(mocker):
     mocker.patch("pymongo.collection.Collection.find_one", find_one)
 
 
-def test_update_pig_successfully(mocker, pig_mongo_mock):
+def test_success_update_pig(mocker, pig_mongo_mock):
     # Test Request
     request_body = {
         "name": "pig-001",
@@ -55,7 +55,7 @@ def test_update_pig_successfully(mocker, pig_mongo_mock):
     assert response_body.get("company_id") == "company-001"
 
 
-def test_update_pig_error_not_found(mocker, pig_mongo_mock):
+def test_error_update_pig_not_found(mocker, pig_mongo_mock):
     # Test Request
     request_body = {
         "name": "pig-001",

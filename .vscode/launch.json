@@ -46,7 +46,7 @@
         "PIG_INSPECTIONS_DB_NAME": "pig-inspections"
       },
       "console": "integratedTerminal",
-      "args": ["tests/pig/test_pig_get_single.py"],
+      "args": ["tests/"],
       "justMyCode": false
     }
   ]
