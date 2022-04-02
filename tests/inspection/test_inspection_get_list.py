@@ -36,7 +36,7 @@ def inspection_mongo_mock(mocker):
     mocker.patch("pymongo.collection.Collection.find", find)
 
 
-def test_get_inspections_from_company_successfully(mocker, inspection_mongo_mock):
+def test_success_get_inspections_from_company(mocker, inspection_mongo_mock):
     # Test Request
     response = client.get(f"{API_PATH}/?company_id={COMPANY_ID}", headers=HEADERS)
     response_body = response.json()
@@ -48,7 +48,7 @@ def test_get_inspections_from_company_successfully(mocker, inspection_mongo_mock
     assert response_body[0].get("company_id") == COMPANY_ID
 
 
-def test_get_inspections_from_pig_successfully(mocker, inspection_mongo_mock):
+def test_success_get_inspections_from_pig(mocker, inspection_mongo_mock):
     # Test Request
     response = client.get(f"{API_PATH}/?pig_id={PIG_ID}", headers=HEADERS)
     response_body = response.json()
@@ -60,7 +60,7 @@ def test_get_inspections_from_pig_successfully(mocker, inspection_mongo_mock):
     assert response_body[0].get("pig_id") == PIG_ID
 
 
-def test_get_inspections_error_empty_list_from_company(mocker, inspection_mongo_mock):
+def test_error_get_inspections_empty_list_from_company(mocker, inspection_mongo_mock):
     # Test Request
     response = client.get(f"{API_PATH}/?company_id=company-002", headers=HEADERS)
     response_body = response.json()

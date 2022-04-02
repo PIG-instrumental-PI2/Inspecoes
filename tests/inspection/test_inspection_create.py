@@ -23,7 +23,7 @@ def inspection_mongo_mock(mocker):
     )
 
 
-def test_create_inspection_successfully(mocker, inspection_mongo_mock):
+def test_success_create_inspection(mocker, inspection_mongo_mock):
     # Test Request
     request_body = {
         "name": "inspection-001",
@@ -45,7 +45,7 @@ def test_create_inspection_successfully(mocker, inspection_mongo_mock):
     assert response_body.get("place") == "Station 001 - Complex 001"
 
 
-def test_create_pig_error_missing_name(mocker, inspection_mongo_mock):
+def test_error_create_pig_missing_name(mocker, inspection_mongo_mock):
     # Test Request
     request_body = {
         "company_id": "company-001",
@@ -67,7 +67,7 @@ def test_create_pig_error_missing_name(mocker, inspection_mongo_mock):
     ]
 
 
-def test_create_pig_error_missing_company(mocker, inspection_mongo_mock):
+def test_error_create_pig_missing_company(mocker, inspection_mongo_mock):
     # Test Request
     request_body = {
         "name": "inspection-001",
@@ -89,7 +89,7 @@ def test_create_pig_error_missing_company(mocker, inspection_mongo_mock):
     ]
 
 
-def test_create_pig_error_missing_pig(mocker, inspection_mongo_mock):
+def test_error_create_pig_missing_pig(mocker, inspection_mongo_mock):
     # Test Request
     request_body = {
         "name": "inspection-001",

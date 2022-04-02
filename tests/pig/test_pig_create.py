@@ -22,7 +22,7 @@ def pig_mongo_mock(mocker):
     )
 
 
-def test_create_pig_successfully(mocker, pig_mongo_mock):
+def test_sucess_create_pig(mocker, pig_mongo_mock):
     # Test Request
     request_body = {
         "name": "pig-001",
@@ -41,7 +41,7 @@ def test_create_pig_successfully(mocker, pig_mongo_mock):
     assert response_body.get("company_id") == "company-001"
 
 
-def test_create_pig_error_missing_name(mocker, pig_mongo_mock):
+def test_error_create_pig_missing_name(mocker, pig_mongo_mock):
     # Test Request
     request_body = {
         "pig_number": "1234",
@@ -62,7 +62,7 @@ def test_create_pig_error_missing_name(mocker, pig_mongo_mock):
     ]
 
 
-def test_create_pig_error_missing_number(mocker, pig_mongo_mock):
+def test_error_create_pig_missing_number(mocker, pig_mongo_mock):
     # Test Request
     request_body = {
         "name": "pig-001",
@@ -83,7 +83,7 @@ def test_create_pig_error_missing_number(mocker, pig_mongo_mock):
     ]
 
 
-def test_create_pig_error_missing_company(mocker, pig_mongo_mock):
+def test_error_create_pig_missing_company(mocker, pig_mongo_mock):
     # Test Request
     request_body = {
         "name": "pig-001",

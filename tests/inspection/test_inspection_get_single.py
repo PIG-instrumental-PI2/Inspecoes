@@ -34,7 +34,7 @@ def inspection_mongo_mock(mocker):
     mocker.patch("pymongo.collection.Collection.find_one", find_one)
 
 
-def test_get_inspection_successfully(mocker, inspection_mongo_mock):
+def test_success_get_inspection(mocker, inspection_mongo_mock):
     # Test Request
     response = client.get(f"{API_PATH}/{INSPECTION_ID}/", headers=HEADERS)
     response_body = response.json()
@@ -49,7 +49,7 @@ def test_get_inspection_successfully(mocker, inspection_mongo_mock):
     assert response_body.get("place") == PLACE
 
 
-def test_get_pigs_error_empty_pig_list_from_company(mocker, inspection_mongo_mock):
+def test_error_get_pigs_empty_pig_list_from_company(mocker, inspection_mongo_mock):
     # Test Request
     response = client.get(f"{API_PATH}/inexistent-inspection/", headers=HEADERS)
     response_body = response.json()

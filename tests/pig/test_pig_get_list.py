@@ -30,7 +30,7 @@ def pig_mongo_mock(mocker):
     mocker.patch("pymongo.collection.Collection.find", find)
 
 
-def test_get_pigs_successfully(mocker, pig_mongo_mock):
+def test_success_get_pigs(mocker, pig_mongo_mock):
     # Test Request
     response = client.get(f"{API_PATH}?company_id={COMPANY_ID}", headers=HEADERS)
     response_body = response.json()
@@ -42,7 +42,7 @@ def test_get_pigs_successfully(mocker, pig_mongo_mock):
     assert response_body[0].get("company_id") == COMPANY_ID
 
 
-def test_get_pigs_error_empty_pig_list_from_company(mocker, pig_mongo_mock):
+def test_error_get_pigs_empty_pig_list_from_company(mocker, pig_mongo_mock):
     # Test Request
     response = client.get(f"{API_PATH}?company_id=company-002", headers=HEADERS)
     response_body = response.json()
