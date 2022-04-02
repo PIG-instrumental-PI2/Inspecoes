@@ -26,8 +26,8 @@ def create_inspection(pig_body: InspectionCreationRequest):
     status_code=status.HTTP_200_OK,
     response_model=List[InspectionModel],
 )
-def get_inspections(company_id: str):
-    inspection_records = InspectionService().get_all_by_company(company_id)
+def get_inspections(company_id: Optional[str] = None, pig_id: Optional[str] = None):
+    inspection_records = InspectionService().get_list_by_filters(company_id, pig_id)
     return inspection_records
 
 

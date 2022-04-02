@@ -21,9 +21,17 @@ class InspectionRepository:
     #     )
     #     return document
 
-    def get_list_by_company(self, company: str) -> List[InspectionModel]:
+    def get_list_by_filters(
+        self, company_id: str = None, pig_id: str = None
+    ) -> List[InspectionModel]:
         records = []
-        for record in self._db_client.get_list(query={"company_id": company}):
+        query = dict()
+        if company_id:
+            query["company_id"] = company_id
+        if pig_id:
+            query["pig_id"] = pig_id
+
+        for record in self._db_client.get_list(query=query):
             records.append(
                 InspectionModel(
                     id=str(record.get("_id")),

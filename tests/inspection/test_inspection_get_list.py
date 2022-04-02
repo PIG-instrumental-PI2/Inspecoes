@@ -19,7 +19,7 @@ PLACE = "Station 001 - Complex 001"
 @pytest.fixture()
 def inspection_mongo_mock(mocker):
     def find(self, filter, projection=None):
-        if filter == {"company_id": COMPANY_ID}:
+        if filter.get("company_id") == COMPANY_ID or filter.get("pig_id") == PIG_ID:
             return [
                 {
                     "_id": INSPECTION_ID,
@@ -46,6 +46,18 @@ def test_get_inspections_from_company_successfully(mocker, inspection_mongo_mock
     assert len(response_body) == 1
     assert response_body[0].get("id") == INSPECTION_ID
     assert response_body[0].get("company_id") == COMPANY_ID
+
+
+def test_get_inspections_from_pig_successfully(mocker, inspection_mongo_mock):
+    # Test Request
+    response = client.get(f"{API_PATH}/?pig_id={PIG_ID}", headers=HEADERS)
+    response_body = response.json()
+
+    # Assertions
+    assert response.status_code == 200
+    assert len(response_body) == 1
+    assert response_body[0].get("id") == INSPECTION_ID
+    assert response_body[0].get("pig_id") == PIG_ID
 
 
 def test_get_inspections_error_empty_list_from_company(mocker, inspection_mongo_mock):
