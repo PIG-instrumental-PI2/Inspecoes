@@ -8,29 +8,37 @@ class BaseCustomException(Exception):
     message = ""
     status_code = status.HTTP_400_BAD_REQUEST
 
+    def __init__(self, message, status_code):
+        self.status_code = status_code
+        self.message = message
+
 
 class BadRequestException(BaseCustomException):
     def __init__(self, message, status_code=status.HTTP_400_BAD_REQUEST):
-        self.status_code = status_code
-        self.message = message
+        super().__init__(message, status_code)
+
+
+class NotFoundException(BaseCustomException):
+    def __init__(self, message, status_code=status.HTTP_404_NOT_FOUND):
+        super().__init__(message, status_code)
 
 
 class InternalServerError(BaseCustomException):
     def __init__(self, message, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR):
-        self.status_code = status_code
-        self.message = message
+        super().__init__(message, status_code)
 
 
 class ExceptionHandler(Exception):
     """Class to handle known exceptions"""
 
     @staticmethod
-    async def exception_handler(request: Request, ex: BaseCustomException):
+    def exception_handler(request: Request, ex: BaseCustomException):
         try:
             status_code = ex.status_code
             error_message = ex.message
-        except Exception:
-            error_message = "An unexpected error occurred"
+        except Exception as ex:
+            print(ex)
+            error_message = "Ocorreu um erro inesperado"
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
         response = {"error": error_message}

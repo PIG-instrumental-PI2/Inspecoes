@@ -1,4 +1,7 @@
 fastapi==0.75.*
+uvicorn==0.17.*
 pymongo==4.0.*
-black
-isort
+requests
+pytest==6.2.*
+pytest-mock==3.6.*
+pytest-cov
