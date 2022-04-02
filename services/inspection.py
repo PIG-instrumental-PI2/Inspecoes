@@ -34,24 +34,15 @@ class InspectionService:
     def get_by_id(self, inspection_id: str) -> InspectionModel:
         return self._inspection_repository.get_by_id(inspection_id)
 
-    def close(self, inspection_id: str):
-        pass
+    def close(self, inspection_id: str) -> InspectionModel:
+        inspection = self.get_by_id(inspection_id)
+        inspection.open = False
+        return self._inspection_repository.update(inspection)
 
-    def _check_inspection_exists(self, inspection_id: str):
-        pass
-
-    # def update(
-    #     self,
-    #     pig_id: str,
-    #     name: str = None,
-    #     company: str = None,
-    #     description: str = None,
-    # ) -> InspectionModel:
-    #     pig_changes = InspectionUpdateModel(
-    #         id=pig_id, name=name, company_id=company, description=description
-    #     )
-    #     self._inspection_repository.update(pig_changes)
-    #     return self.get_by_id(pig_id)
+    def open(self, inspection_id: str) -> InspectionModel:
+        inspection = self.get_by_id(inspection_id)
+        inspection.open = True
+        return self._inspection_repository.update(inspection)
 
     # def delete(self, pig_id: str):
     #     self._inspection_repository.delete(pig_id)

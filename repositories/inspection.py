@@ -14,12 +14,12 @@ class InspectionRepository:
         document.id = document_id
         return document
 
-    # def update(self, document: InspectionModel) -> InspectionModel:
-    #     self._db_client.update(
-    #         document.dict(exclude={"id"}, exclude_unset=True, exclude_none=True),
-    #         query={"_id": document.id},
-    #     )
-    #     return document
+    def update(self, document: InspectionModel) -> InspectionModel:
+        self._db_client.update(
+            document.dict(exclude={"id"}, exclude_unset=True, exclude_none=True),
+            query={"_id": document.id},
+        )
+        return document
 
     def get_list_by_filters(
         self, company_id: str = None, pig_id: str = None

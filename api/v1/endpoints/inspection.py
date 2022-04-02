@@ -49,3 +49,13 @@ def get_inspection(inspection_id: str):
 def close_inspection(inspection_id: str):
     inspection_record = InspectionService().close(inspection_id)
     return inspection_record
+
+
+@router.post(
+    "/{inspection_id}/open",
+    status_code=status.HTTP_201_CREATED,
+    response_model=InspectionModel,
+)
+def close_inspection(inspection_id: str):
+    inspection_record = InspectionService().open(inspection_id)
+    return inspection_record
