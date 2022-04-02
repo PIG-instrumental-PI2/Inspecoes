@@ -3,16 +3,13 @@ from typing import List, Optional
 from fastapi import APIRouter, status
 
 from models.inspection import InspectionModel
-from schemas.requests.inspection import InspectionCreationRequest
-from schemas.responses.inspection import InspectionResponse
+from schemas.inspection import InspectionCreationRequest
 from services.inspection import InspectionService
 
 router = APIRouter()
 
 
-@router.post(
-    "/", status_code=status.HTTP_201_CREATED, response_model=InspectionResponse
-)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=InspectionModel)
 def create_inspection(pig_body: InspectionCreationRequest):
     inspection_record = InspectionService().create(
         name=pig_body.name,
@@ -21,15 +18,7 @@ def create_inspection(pig_body: InspectionCreationRequest):
         place=pig_body.place,
         description=pig_body.description,
     )
-    return InspectionResponse(
-        id=inspection_record.id,
-        name=inspection_record.name,
-        company_id=inspection_record.company_id,
-        pig_id=inspection_record.pig_id,
-        open=inspection_record.open,
-        place=inspection_record.place,
-        description=inspection_record.description,
-    )
+    return inspection_record
 
 
 @router.get(
@@ -45,34 +34,18 @@ def get_inspections(company_id: str):
 @router.get(
     "/{inspection_id}",
     status_code=status.HTTP_200_OK,
-    response_model=InspectionResponse,
+    response_model=InspectionModel,
 )
 def get_inspection(inspection_id: str):
     inspection_record = InspectionService().get_by_id(inspection_id)
-    return InspectionResponse(
-        id=inspection_record.id,
-        name=inspection_record.name,
-        company_id=inspection_record.company_id,
-        pig_id=inspection_record.pig_id,
-        open=inspection_record.open,
-        place=inspection_record.place,
-        description=inspection_record.description,
-    )
+    return inspection_record
 
 
 @router.post(
     "/{inspection_id}/close",
     status_code=status.HTTP_201_CREATED,
-    response_model=InspectionResponse,
+    response_model=InspectionModel,
 )
 def close_inspection(inspection_id: str):
     inspection_record = InspectionService().close(inspection_id)
-    return InspectionResponse(
-        id=inspection_record.id,
-        name=inspection_record.name,
-        company_id=inspection_record.company_id,
-        pig_id=inspection_record.pig_id,
-        open=inspection_record.open,
-        place=inspection_record.place,
-        description=inspection_record.description,
-    )
+    return inspection_record

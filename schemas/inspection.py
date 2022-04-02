@@ -3,6 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 
+################# Requests #################
 class InspectionCreationRequest(BaseModel):
     name: str
     company_id: str

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.v1.api import api_router as api_v1
-from schemas.responses.healthcheck import HealthCheckResponse
+from schemas.healthcheck import HealthCheckResponse
 from utils.exception_handlers import (
     BadRequestException,
     ExceptionHandler,
