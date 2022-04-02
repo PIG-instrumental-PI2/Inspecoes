@@ -35,19 +35,21 @@ class InspectionRepository:
     #         )
     #     return records
 
-    # def get_by_id(self, pig_id: str) -> InspectionModel:
-    #     record = self._db_client.get(query={"_id": pig_id})
+    def get_by_id(self, pig_id: str) -> InspectionModel:
+        record = self._db_client.get(query={"_id": pig_id})
 
-    #     if record:
-    #         return InspectionModel(
-    #             id=str(record.get("_id")),
-    #             pig_number=record.get("pig_number"),
-    #             name=record.get("name"),
-    #             company_id=record.get("company_id"),
-    #             description=record.get("description"),
-    #         )
-    #     else:
-    #         raise NotFoundException("Resource Not Found")
+        if record:
+            return InspectionModel(
+                id=str(record.get("_id")),
+                name=record.get("name"),
+                company_id=record.get("company_id"),
+                pig_id=record.get("pig_id"),
+                open=record.get("open"),
+                place=record.get("place"),
+                description=record.get("description"),
+            )
+        else:
+            raise NotFoundException("Resource Not Found")
 
     # def delete(self, pig_id: str):
     #     self._db_client.delete(query={"_id": pig_id})

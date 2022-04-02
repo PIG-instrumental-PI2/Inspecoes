@@ -6,7 +6,7 @@ from repositories.inspection import InspectionRepository
 
 class InspectionService:
     def __init__(self) -> None:
-        self._pig_repository = InspectionRepository()
+        self._inspection_repository = InspectionRepository()
 
     def create(
         self,
@@ -24,7 +24,16 @@ class InspectionService:
             place=place,
             description=description,
         )
-        return self._pig_repository.save(inspection_document)
+        return self._inspection_repository.save(inspection_document)
+
+    def get_by_id(self, inspection_id: str) -> InspectionModel:
+        return self._inspection_repository.get_by_id(inspection_id)
+
+    def close(self, inspection_id: str):
+        pass
+
+    def _check_inspection_exists(self, inspection_id: str):
+        pass
 
     # def update(
     #     self,
@@ -36,14 +45,11 @@ class InspectionService:
     #     pig_changes = InspectionUpdateModel(
     #         id=pig_id, name=name, company_id=company, description=description
     #     )
-    #     self._pig_repository.update(pig_changes)
+    #     self._inspection_repository.update(pig_changes)
     #     return self.get_by_id(pig_id)
 
-    # def get_by_id(self, pig_id: str) -> InspectionModel:
-    #     return self._pig_repository.get_by_id(pig_id)
-
     # def get_all_by_company(self, company: str) -> List[InspectionModel]:
-    #     return self._pig_repository.get_list_by_company(company)
+    #     return self._inspection_repository.get_list_by_company(company)
 
     # def delete(self, pig_id: str):
-    #     self._pig_repository.delete(pig_id)
+    #     self._inspection_repository.delete(pig_id)
