@@ -10,3 +10,9 @@ class InspectionCreationRequest(BaseModel):
     pig_id: str
     place: Optional[str]
     description: Optional[str]
+
+
+################# Responses #################
+class InspectionDeleteResponse(BaseModel):
+    id: str
+    status = "deleted"

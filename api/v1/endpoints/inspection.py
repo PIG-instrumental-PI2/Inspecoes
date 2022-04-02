@@ -3,7 +3,7 @@ from typing import List, Optional
 from fastapi import APIRouter, status
 
 from models.inspection import InspectionModel
-from schemas.inspection import InspectionCreationRequest
+from schemas.inspection import InspectionCreationRequest, InspectionDeleteResponse
 from services.inspection import InspectionService
 
 router = APIRouter()
@@ -59,3 +59,13 @@ def close_inspection(inspection_id: str):
 def close_inspection(inspection_id: str):
     inspection_record = InspectionService().open(inspection_id)
     return inspection_record
+
+
+@router.delete(
+    "/{inspection_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=InspectionDeleteResponse,
+)
+def delete_pig(inspection_id: str):
+    InspectionService().delete(inspection_id=inspection_id)
+    return InspectionDeleteResponse(id=inspection_id)

@@ -44,5 +44,5 @@ class InspectionService:
         inspection.open = True
         return self._inspection_repository.update(inspection)
 
-    # def delete(self, pig_id: str):
-    #     self._inspection_repository.delete(pig_id)
+    def delete(self, inspection_id: str):
+        self._inspection_repository.delete(inspection_id)
