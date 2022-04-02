@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from fastapi import APIRouter, status
 
+from models.inspection import InspectionModel
 from schemas.requests.inspection import InspectionCreationRequest
 from schemas.responses.inspection import InspectionResponse
 from services.inspection import InspectionService
@@ -29,6 +30,16 @@ def create_inspection(pig_body: InspectionCreationRequest):
         place=inspection_record.place,
         description=inspection_record.description,
     )
+
+
+@router.get(
+    "/",
+    status_code=status.HTTP_200_OK,
+    response_model=List[InspectionModel],
+)
+def get_inspections(company_id: str):
+    inspection_records = InspectionService().get_all_by_company(company_id)
+    return inspection_records
 
 
 @router.get(

@@ -18,16 +18,6 @@ PLACE = "Station 001 - Complex 001"
 
 @pytest.fixture()
 def inspection_mongo_mock(mocker):
-    class MongoResponse:
-        inserted_id = ObjectId(INSPECTION_ID)
-
-    mocker.patch(
-        "pymongo.collection.Collection.insert_one", return_value=MongoResponse()
-    )
-
-
-@pytest.fixture()
-def inspection_mongo_mock(mocker):
     def find_one(self, filter, projection=None):
         if filter == {"_id": ObjectId(INSPECTION_ID)}:
             return {

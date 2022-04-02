@@ -21,19 +21,21 @@ class InspectionRepository:
     #     )
     #     return document
 
-    # def get_list_by_company(self, company: str) -> List[InspectionModel]:
-    #     records = []
-    #     for record in self._db_client.get_list(query={"company_id": company}):
-    #         records.append(
-    #             InspectionModel(
-    #                 id=str(record.get("_id")),
-    #                 pig_number=record.get("pig_number"),
-    #                 name=record.get("name"),
-    #                 company_id=record.get("company_id"),
-    #                 description=record.get("description"),
-    #             )
-    #         )
-    #     return records
+    def get_list_by_company(self, company: str) -> List[InspectionModel]:
+        records = []
+        for record in self._db_client.get_list(query={"company_id": company}):
+            records.append(
+                InspectionModel(
+                    id=str(record.get("_id")),
+                    name=record.get("name"),
+                    company_id=record.get("company_id"),
+                    pig_id=record.get("pig_id"),
+                    open=record.get("open"),
+                    place=record.get("place"),
+                    description=record.get("description"),
+                )
+            )
+        return records
 
     def get_by_id(self, pig_id: str) -> InspectionModel:
         record = self._db_client.get(query={"_id": pig_id})

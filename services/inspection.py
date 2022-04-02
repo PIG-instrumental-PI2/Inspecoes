@@ -26,6 +26,9 @@ class InspectionService:
         )
         return self._inspection_repository.save(inspection_document)
 
+    def get_all_by_company(self, company_id: str) -> List[InspectionModel]:
+        return self._inspection_repository.get_list_by_company(company_id)
+
     def get_by_id(self, inspection_id: str) -> InspectionModel:
         return self._inspection_repository.get_by_id(inspection_id)
 
@@ -47,9 +50,6 @@ class InspectionService:
     #     )
     #     self._inspection_repository.update(pig_changes)
     #     return self.get_by_id(pig_id)
-
-    # def get_all_by_company(self, company: str) -> List[InspectionModel]:
-    #     return self._inspection_repository.get_list_by_company(company)
 
     # def delete(self, pig_id: str):
     #     self._inspection_repository.delete(pig_id)
