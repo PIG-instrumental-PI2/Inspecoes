@@ -1,11 +1,10 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, File, Request, UploadFile, status
+from fastapi import APIRouter, status
 
+from libraries.crc_utils import CRCUtils
 from models.inspection import InspectionModel
-from schemas.data_input import CRCResponse
 from schemas.inspection import InspectionCreationRequest, InspectionDeleteResponse
-from services.data_input import DataInputService
 from services.inspection import InspectionService
 
 router = APIRouter()
@@ -71,21 +70,3 @@ def close_inspection(inspection_id: str):
 def delete_pig(inspection_id: str):
     InspectionService().delete(inspection_id=inspection_id)
     return InspectionDeleteResponse(id=inspection_id)
-
-
-############################## Data Input ##############################
-@router.post(
-    "/{inspection_id}/data-input",
-    status_code=status.HTTP_201_CREATED,
-    response_model=bool,
-)
-async def upload_data(inspection_id: str, inspection_data: bytes = File(...)):
-# async def upload_data(inspection_id: str, request: Request):
-    # inspection_data: bytes = await request.body()
-    if inspection_data:
-        data_saved = DataInputService().upload_data(
-            inspection_id=inspection_id, encoded_data=inspection_data
-        )
-    else:
-        data_saved = False
-    return data_saved
