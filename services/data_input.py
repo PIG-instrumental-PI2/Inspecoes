@@ -1,10 +1,8 @@
-import binascii
-from typing import List, Tuple
+from typing import List
 
 from libraries.crc_utils import CRC_SIZE, CRCUtils
-from utils.exception_handlers import InternalServerError
-
-# from repositories.data_input import DataInputRepository
+from models.measurement import MeasurementModel
+from repositories.measurements import MeasurementRepository
 
 MAGNETIC_FIELDS_AMOUNT = 16
 # Sizes in byte
@@ -25,10 +23,9 @@ TOTAL_SIZE = (
 
 class DataInputService:
     def __init__(self) -> None:
-        # self._inspection_repository = DataInputRepository()
-        pass
+        self._measurement_repository = MeasurementRepository()
 
-    def upload_data(self, pig_id: str, encoded_data: bytes) -> List[int]:
+    def upload_data(self, inspection_id: str, encoded_data: bytes) -> List[int]:
         corrupted_measurements = []
 
         for index, measurement_bytes in enumerate(self._get_measurements(encoded_data)):
@@ -36,9 +33,18 @@ class DataInputService:
                 data_bytes, crc = CRCUtils.get_data(measurement_bytes)
                 if CRCUtils.check_integrity(data_bytes, crc):
                     measurement = self._parse_measurement(data_bytes)
+                    self._measurement_repository.save(
+                        MeasurementModel(
+                            inspection_id=inspection_id,
+                            timestamp=measurement.get("time"),
+                            speed=measurement.get("speed"),
+                            magnetic_fields=measurement.get("magnetic_fields"),
+                            temperature=measurement.get("temperature"),
+                        )
+                    )
                 else:
                     raise TypeError()
-            except:
+            except Exception as ex:
                 corrupted_measurements.append(index)
 
         return corrupted_measurements
@@ -55,7 +61,6 @@ class DataInputService:
             yield measurement
 
     def _parse_measurement(self, data_bytes: bytes) -> dict:
-        # try:
         begin_pos = 0
         end_pos = begin_pos + TIME_SIZE
 
@@ -77,16 +82,9 @@ class DataInputService:
         end_pos = begin_pos + TEMPERATURE_SIZE
         temperature_data = CRCUtils.float_from_bytes(data_bytes[begin_pos:end_pos])
 
-        begin_pos = end_pos
-        end_pos = begin_pos + PIG_NUMBER_SIZE
-        pig_number_data = CRCUtils.int_from_bytes(data_bytes[begin_pos:end_pos])
-
         return {
             "time": time_data,
             "speed": speed_data,
             "magnetic_fields": magnetic_fields,
             "temperature": temperature_data,
-            "pig_number": pig_number_data,
         }
-        # except:
-        #     raise InternalServerError("Erro ao analisar medicao")

@@ -13,7 +13,7 @@ class InspectionService:
         name: str,
         company_id: str,
         pig_id: str,
-        place: str,
+        place: str = None,
         description: str = None,
     ) -> InspectionModel:
         inspection_document = InspectionModel(

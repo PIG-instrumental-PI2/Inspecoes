@@ -47,4 +47,4 @@ def test_error_get_pigs_empty_pig_list_from_company(mocker, pig_mongo_mock):
 
     # Assertions
     assert response.status_code == 404
-    assert response_body == {"error": "Resource Not Found"}
+    assert response_body == {"error": "PIG não encontrado"}

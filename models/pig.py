@@ -9,6 +9,7 @@ class PIGModel(BaseModel):
     name: str
     company_id: str
     description: Optional[str]
+    last_inspection: Optional[str]
 
 
 class PIGUpdateModel(BaseModel):
@@ -16,3 +17,4 @@ class PIGUpdateModel(BaseModel):
     name: Optional[str]
     company_id: Optional[str]
     description: Optional[str]
+    last_inspection: Optional[str]

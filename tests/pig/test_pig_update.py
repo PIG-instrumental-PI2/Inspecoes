@@ -70,4 +70,4 @@ def test_error_update_pig_not_found(mocker, pig_mongo_mock):
 
     # Assertions
     assert response.status_code == 404
-    assert response_body == {"error": "Resource Not Found"}
+    assert response_body == {"error": "PIG não encontrado"}

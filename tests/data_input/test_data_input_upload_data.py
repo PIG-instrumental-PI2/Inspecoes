@@ -1,6 +1,3 @@
-import io
-from io import BytesIO
-
 import pytest
 from bson.objectid import ObjectId
 from fastapi.testclient import TestClient
@@ -16,6 +13,7 @@ client = TestClient(app)
 API_PATH = "/api/v1/data-input"
 INSPECTION_ID = "a43923db765b869af8577c7c"
 PIG_ID = "62439cf9f7d653a9088ba15a"
+PIG_ID_2 = "8fdf560b3ca5589f7c4af29b"
 COMPANY_ID = "company-001"
 OPENED = True
 PLACE = "Station 001 - Complex 001"
@@ -48,9 +46,29 @@ INSP_PIG_NUMBER = 1
 @pytest.fixture()
 def data_mongo_mock(mocker):
     class MongoResponse:
-        inserted_id = ObjectId(INSPECTION_ID)
+        def __init__(self, id=INSPECTION_ID) -> None:
+            self.inserted_id = ObjectId(id)
+            self.upserted_id = ObjectId(id)
 
     def find_one(self, filter, projection=None):
+        if filter == {"_id": ObjectId(PIG_ID)}:
+            return {
+                "_id": PIG_ID,
+                "name": "pig-001",
+                "pig_number": "1234",
+                "company_id": COMPANY_ID,
+                "description": "",
+                "last_inspection": INSPECTION_ID,
+            }
+        if filter == {"_id": ObjectId(PIG_ID_2)}:
+            return {
+                "_id": PIG_ID_2,
+                "name": "pig-002",
+                "pig_number": "1235",
+                "company_id": COMPANY_ID,
+                "description": "",
+                "last_inspection": None,
+            }
         if filter == {"_id": ObjectId(INSPECTION_ID)}:
             return {
                 "_id": INSPECTION_ID,
@@ -66,6 +84,9 @@ def data_mongo_mock(mocker):
     mocker.patch("pymongo.collection.Collection.find_one", find_one)
     mocker.patch(
         "pymongo.collection.Collection.insert_one", return_value=MongoResponse()
+    )
+    mocker.patch(
+        "pymongo.collection.Collection.update_one", return_value=MongoResponse(PIG_ID)
     )
 
 
@@ -110,6 +131,22 @@ def test_success_upload_data_1_measurement(
     inspection_data = {"inspection_data": complete_data}
 
     response = client.post(f"{API_PATH}/{PIG_ID}", files=inspection_data)
+    response_body = response._content
+
+    # Assertions
+    assert response.status_code == 201
+    assert response_body == b""
+
+
+def test_success_upload_data_1_measurement_create_another_inspection(
+    mocker, data_mongo_mock, intact_measurement_bytes
+):
+    complete_data = intact_measurement_bytes
+
+    # Test Request
+    inspection_data = {"inspection_data": complete_data}
+
+    response = client.post(f"{API_PATH}/{PIG_ID_2}", files=inspection_data)
     response_body = response._content
 
     # Assertions
