@@ -4,7 +4,12 @@ from fastapi.testclient import TestClient
 
 from libraries.crc_utils import CRCUtils
 from main import app
-from services.data_input import PIG_NUMBER_SIZE, SPEED_SIZE, TEMPERATURE_SIZE, TIME_SIZE
+from services.data_input import (
+    MAGNETIC_FIELD_SIZE,
+    SPEED_SIZE,
+    TEMPERATURE_SIZE,
+    TIME_SIZE,
+)
 
 HEADERS = dict()
 
@@ -91,172 +96,159 @@ def data_mongo_mock(mocker):
 
 
 @pytest.fixture()
-def intact_measurement_bytes():
-    complete_data = CRCUtils.int_to_bytes(INSP_TIME, byte_size=TIME_SIZE)
-    complete_data += CRCUtils.float_to_bytes(INSP_SPEED, byte_size=SPEED_SIZE)
-    complete_data += b"".join(
-        [CRCUtils.float_to_bytes(mag, byte_size=4) for mag in INSP_MAGNETIC_FIELDS]
+def measurement_bytes():
+    data = CRCUtils.int_to_bytes(INSP_TIME, byte_size=TIME_SIZE)
+    data += CRCUtils.float_to_bytes(INSP_SPEED, byte_size=SPEED_SIZE)
+    data += b"".join(
+        [
+            CRCUtils.float_to_bytes(mag, byte_size=MAGNETIC_FIELD_SIZE)
+            for mag in INSP_MAGNETIC_FIELDS
+        ]
     )
-    complete_data += CRCUtils.float_to_bytes(
-        INSP_TEMPERATURE, byte_size=TEMPERATURE_SIZE
-    )
-    complete_data += CRCUtils.int_to_bytes(INSP_PIG_NUMBER, byte_size=PIG_NUMBER_SIZE)
-    complete_data = CRCUtils.encode_data(complete_data)
-    return complete_data
+    data += CRCUtils.float_to_bytes(INSP_TEMPERATURE, byte_size=TEMPERATURE_SIZE)
+    return data
 
 
-@pytest.fixture()
-def corrupted_measurement_bytes():
-    complete_data = CRCUtils.int_to_bytes(INSP_TIME, byte_size=TIME_SIZE)
-    complete_data += CRCUtils.float_to_bytes(INSP_SPEED, byte_size=SPEED_SIZE)
-    complete_data += b"".join(
-        [CRCUtils.float_to_bytes(mag, byte_size=4) for mag in INSP_MAGNETIC_FIELDS]
-    )
-    complete_data += CRCUtils.float_to_bytes(
-        INSP_TEMPERATURE, byte_size=TEMPERATURE_SIZE
-    )
-    complete_data += CRCUtils.int_to_bytes(INSP_PIG_NUMBER, byte_size=PIG_NUMBER_SIZE)
-    complete_data = CRCUtils.encode_data(complete_data)
-    # Data Change
-    complete_data = b"E" + complete_data[1:]
-    return complete_data
-
-
-def test_success_upload_data_1_measurement(
-    mocker, data_mongo_mock, intact_measurement_bytes
-):
-    complete_data = intact_measurement_bytes
+def test_success_upload_data_1_measurement(mocker, data_mongo_mock, measurement_bytes):
+    data = measurement_bytes
+    # Calculate CRC
+    data = CRCUtils.encode_data(data)
 
     # Test Request
-    inspection_data = {"inspection_data": complete_data}
+    inspection_data = {"inspection_data": data}
 
     response = client.post(f"{API_PATH}/{PIG_ID}", files=inspection_data)
     response_body = response._content
 
     # Assertions
     assert response.status_code == 201
-    assert response_body == b""
+    assert response_body == b"OK"
 
 
 def test_success_upload_data_1_measurement_create_another_inspection(
-    mocker, data_mongo_mock, intact_measurement_bytes
+    mocker, data_mongo_mock, measurement_bytes
 ):
-    complete_data = intact_measurement_bytes
+    data = measurement_bytes
+    # Calculate CRC
+    data = CRCUtils.encode_data(data)
 
     # Test Request
-    inspection_data = {"inspection_data": complete_data}
+    inspection_data = {"inspection_data": data}
 
     response = client.post(f"{API_PATH}/{PIG_ID_2}", files=inspection_data)
     response_body = response._content
 
     # Assertions
     assert response.status_code == 201
-    assert response_body == b""
+    assert response_body == b"OK"
 
 
-def test_success_upload_data_1_measurement_1_corrupted(
-    mocker, data_mongo_mock, corrupted_measurement_bytes
+def test_error_upload_data_1_measurement_1_corrupted(
+    mocker, data_mongo_mock, measurement_bytes
 ):
-    complete_data = corrupted_measurement_bytes
+    data = measurement_bytes
+    # Calculate CRC
+    data = CRCUtils.encode_data(data)
+    # Data corruption
+    data = b"E" + data[1:]
 
     # Test Request
-    inspection_data = {"inspection_data": complete_data}
+    inspection_data = {"inspection_data": data}
 
     response = client.post(f"{API_PATH}/{PIG_ID}", files=inspection_data)
     response_body = response._content
 
     # Assertions
-    assert response.status_code == 201
-    # medicao 0 com erro
-    assert response_body == b"\x00\x00"
-
-
-def test_success_upload_data_2_measurements_1_corrupted(
-    mocker, data_mongo_mock, intact_measurement_bytes, corrupted_measurement_bytes
-):
-    complete_data = intact_measurement_bytes + corrupted_measurement_bytes
-
-    # Test Request
-    inspection_data = {"inspection_data": complete_data}
-
-    response = client.post(f"{API_PATH}/{PIG_ID}", files=inspection_data)
-    response_body = response._content
-
-    # Assertions
-    assert response.status_code == 201
+    assert response.status_code == 400
     # medicao 1 com erro
-    assert response_body == b"\x00\x01"
+    assert response_body == b"CORRUPTED"
 
 
-def test_success_upload_data_2_measurements_2_corrupted(
-    mocker, data_mongo_mock, intact_measurement_bytes, corrupted_measurement_bytes
-):
-    complete_data = corrupted_measurement_bytes + corrupted_measurement_bytes
+def test_success_upload_data_2_measurements(mocker, data_mongo_mock, measurement_bytes):
+    data = measurement_bytes * 2
+    # Calculate CRC
+    data = CRCUtils.encode_data(data)
 
     # Test Request
-    inspection_data = {"inspection_data": complete_data}
+    inspection_data = {"inspection_data": data}
 
     response = client.post(f"{API_PATH}/{PIG_ID}", files=inspection_data)
     response_body = response._content
 
     # Assertions
     assert response.status_code == 201
-    # medicao 0 e 1 com erro
-    assert response_body == b"\x00\x00\x00\x01"
+    assert response_body == b"OK"
 
 
-def test_success_upload_data_3_measurements_2_corrupted(
-    mocker, data_mongo_mock, intact_measurement_bytes, corrupted_measurement_bytes
+def test_success_upload_data_100_measurements(
+    mocker, data_mongo_mock, measurement_bytes
 ):
-    complete_data = (
-        corrupted_measurement_bytes
-        + intact_measurement_bytes
-        + corrupted_measurement_bytes
-    )
+    data = measurement_bytes * 100
+    # Calculate CRC
+    data = CRCUtils.encode_data(data)
 
     # Test Request
-    inspection_data = {"inspection_data": complete_data}
+    inspection_data = {"inspection_data": data}
 
     response = client.post(f"{API_PATH}/{PIG_ID}", files=inspection_data)
     response_body = response._content
 
     # Assertions
     assert response.status_code == 201
-    # medicao 0 e 1 com erro
-    assert response_body == b"\x00\x00\x00\x02"
+    assert response_body == b"OK"
 
 
-def test_success_upload_data_measurement_2_corrupted_incomplete_data(
-    mocker, data_mongo_mock, intact_measurement_bytes, corrupted_measurement_bytes
+def test_error_upload_data_2_measurements_1_corrupted(
+    mocker, data_mongo_mock, measurement_bytes
 ):
-    complete_data = corrupted_measurement_bytes + b"E"
+    data = measurement_bytes * 2
+    # Calculate CRC
+    data = CRCUtils.encode_data(data)
+    data = b"E" + data[1:]
 
     # Test Request
-    inspection_data = {"inspection_data": complete_data}
+    inspection_data = {"inspection_data": data}
 
     response = client.post(f"{API_PATH}/{PIG_ID}", files=inspection_data)
     response_body = response._content
 
     # Assertions
-    assert response.status_code == 201
-    # medicao 0 e 1 com erro
-    assert response_body == b"\x00\x00\x00\x01"
+    assert response.status_code == 400
+    # medicao 1 com erro
+    assert response_body == b"CORRUPTED"
 
 
-def test_error_upload_data_valid_crc_invalid_data_format(
-    mocker, data_mongo_mock, intact_measurement_bytes, corrupted_measurement_bytes
+def test_success_upload_data_2_measurements_1_corrupted_incomplete_data(
+    mocker, data_mongo_mock, measurement_bytes
 ):
-    data = b"z"
-    encoded = CRCUtils.encode_data(data)
-    complete_data = encoded
+    data = measurement_bytes + b"E"
+    # Calculate CRC
+    data = CRCUtils.encode_data(data)
 
     # Test Request
-    inspection_data = {"inspection_data": complete_data}
+    inspection_data = {"inspection_data": data}
 
     response = client.post(f"{API_PATH}/{PIG_ID}", files=inspection_data)
     response_body = response._content
 
     # Assertions
-    assert response.status_code == 201
-    # medicao 0 com erro
-    assert response_body == b"\x00\x00"
+    assert response.status_code == 400
+    # medicao 2 com erro
+    assert response_body == b"CORRUPTED"
+
+
+def test_error_upload_data_valid_crc_invalid_data_format(mocker, data_mongo_mock):
+    data = b"INVALID_DATA"
+    # Calculate CRC
+    data = CRCUtils.encode_data(data)
+
+    # Test Request
+    inspection_data = {"inspection_data": data}
+
+    response = client.post(f"{API_PATH}/{PIG_ID}", files=inspection_data)
+    response_body = response._content
+
+    # Assertions
+    assert response.status_code == 400
+    # medicao 1 com erro
+    assert response_body == b"CORRUPTED"

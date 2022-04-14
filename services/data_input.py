@@ -1,4 +1,4 @@
-from typing import List
+from datetime import datetime
 
 from libraries.crc_utils import CRC_SIZE, CRCUtils
 from models.measurement import MeasurementModel
@@ -10,14 +10,11 @@ TIME_SIZE = 4
 SPEED_SIZE = 4
 MAGNETIC_FIELD_SIZE = 4
 TEMPERATURE_SIZE = 4
-PIG_NUMBER_SIZE = 1
-TOTAL_SIZE = (
+READING_SIZE = (
     TIME_SIZE
     + SPEED_SIZE
     + MAGNETIC_FIELD_SIZE * MAGNETIC_FIELDS_AMOUNT
     + TEMPERATURE_SIZE
-    + PIG_NUMBER_SIZE
-    + CRC_SIZE
 )
 
 
@@ -25,36 +22,38 @@ class DataInputService:
     def __init__(self) -> None:
         self._measurement_repository = MeasurementRepository()
 
-    def upload_data(self, inspection_id: str, encoded_data: bytes) -> List[int]:
-        corrupted_measurements = []
+    def upload_data(self, inspection_id: str, encoded_data: bytes) -> bool:
+        corrupted = False
 
-        for index, measurement_bytes in enumerate(self._get_measurements(encoded_data)):
-            try:
-                data_bytes, crc = CRCUtils.get_data(measurement_bytes)
-                if CRCUtils.check_integrity(data_bytes, crc):
-                    measurement = self._parse_measurement(data_bytes)
+        try:
+            data_bytes, crc = CRCUtils.get_data(encoded_data)
+            if CRCUtils.check_integrity(data_bytes, crc):
+                for measurement_bytes in self._get_measurements(data_bytes):
+                    measurement = self._parse_measurement(measurement_bytes)
                     self._measurement_repository.save(
                         MeasurementModel(
                             inspection_id=inspection_id,
-                            timestamp=measurement.get("time"),
+                            timestamp=datetime.utcfromtimestamp(
+                                measurement.get("time")
+                            ),
                             speed=measurement.get("speed"),
                             magnetic_fields=measurement.get("magnetic_fields"),
                             temperature=measurement.get("temperature"),
                         )
                     )
-                else:
-                    raise TypeError()
-            except Exception as ex:
-                corrupted_measurements.append(index)
+            else:
+                raise TypeError()
+        except Exception as ex:
+            corrupted = True
 
-        return corrupted_measurements
+        return corrupted
 
     def _get_measurements(self, data_bytes: bytes):
         begin = 0
         end = 0
         while True:
             begin = end
-            end = begin + TOTAL_SIZE
+            end = begin + READING_SIZE
             measurement = data_bytes[begin:end]
             if not measurement:
                 break
