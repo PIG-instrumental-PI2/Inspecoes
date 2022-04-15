@@ -6,7 +6,7 @@ from repositories.measurements import MeasurementRepository
 
 MAGNETIC_FIELDS_AMOUNT = 16
 # Sizes in byte
-TIME_SIZE = 4
+TIME_SIZE = 8
 SPEED_SIZE = 4
 MAGNETIC_FIELD_SIZE = 4
 TEMPERATURE_SIZE = 4
@@ -34,7 +34,9 @@ class DataInputService:
                         MeasurementModel(
                             inspection_id=inspection_id,
                             timestamp=datetime.utcfromtimestamp(
-                                measurement.get("time")
+                                self._convert_uint_timestamp_milis_to_float(
+                                    measurement.get("timestamp_milis")
+                                )
                             ),
                             speed=measurement.get("speed"),
                             magnetic_fields=measurement.get("magnetic_fields"),
@@ -82,8 +84,11 @@ class DataInputService:
         temperature_data = CRCUtils.float_from_bytes(data_bytes[begin_pos:end_pos])
 
         return {
-            "time": time_data,
+            "timestamp_milis": time_data,
             "speed": speed_data,
             "magnetic_fields": magnetic_fields,
             "temperature": temperature_data,
         }
+
+    def _convert_uint_timestamp_milis_to_float(self, timestamp_uint):
+        return timestamp_uint / 1000
