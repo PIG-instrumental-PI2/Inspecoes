@@ -2,15 +2,20 @@ from typing import List, Optional
 
 from fastapi import APIRouter, status
 
+from libraries.crc_utils import CRCUtils
 from models.inspection import InspectionModel
 from schemas.inspection import InspectionCreationRequest, InspectionDeleteResponse
 from services.inspection import InspectionService
+from services.pig import PIGService
 
 router = APIRouter()
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=InspectionModel)
 def create_inspection(pig_body: InspectionCreationRequest):
+    pig_service = PIGService()
+    pig_record = pig_service.get_by_id(pig_id=pig_body.pig_id)
+
     inspection_record = InspectionService().create(
         name=pig_body.name,
         company_id=pig_body.company_id,
@@ -18,6 +23,7 @@ def create_inspection(pig_body: InspectionCreationRequest):
         place=pig_body.place,
         description=pig_body.description,
     )
+    pig_service.update(pig_record.id, last_inspection=inspection_record.id)
     return inspection_record
 
 

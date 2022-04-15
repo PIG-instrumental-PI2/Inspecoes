@@ -59,7 +59,7 @@ class InspectionRepository:
                 description=record.get("description"),
             )
         else:
-            raise NotFoundException("Resource Not Found")
+            raise NotFoundException("Inspeção não encontrada")
 
     def delete(self, pig_id: str):
         self._db_client.delete(query={"_id": pig_id})

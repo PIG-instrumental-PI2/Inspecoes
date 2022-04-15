@@ -70,7 +70,7 @@ def test_error_close_inspection_inexistent(mocker, inspection_mongo_mock):
 
     # Assertions
     assert response.status_code == 404
-    assert response_body == {"error": "Resource Not Found"}
+    assert response_body == {"error": "Inspeção não encontrada"}
 
 
 def test_error_open_inspection_inexistent(mocker, inspection_mongo_mock):
@@ -80,4 +80,4 @@ def test_error_open_inspection_inexistent(mocker, inspection_mongo_mock):
 
     # Assertions
     assert response.status_code == 404
-    assert response_body == {"error": "Resource Not Found"}
+    assert response_body == {"error": "Inspeção não encontrada"}

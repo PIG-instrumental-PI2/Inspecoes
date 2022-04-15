@@ -45,9 +45,10 @@ class PIGRepository:
                 name=record.get("name"),
                 company_id=record.get("company_id"),
                 description=record.get("description"),
+                last_inspection=record.get("last_inspection"),
             )
         else:
-            raise NotFoundException("Resource Not Found")
+            raise NotFoundException("PIG não encontrado")
 
     def delete(self, pig_id: str):
         self._db_client.delete(query={"_id": pig_id})
