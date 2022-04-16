@@ -1,12 +1,10 @@
-from datetime import datetime
-
 from libraries.crc_utils import CRC_SIZE, CRCUtils
 from models.measurement import MeasurementModel
 from repositories.measurements import MeasurementRepository
 
 MAGNETIC_FIELDS_AMOUNT = 16
 # Sizes in byte
-TIME_SIZE = 8
+TIME_SIZE = 4
 SPEED_SIZE = 4
 MAGNETIC_FIELD_SIZE = 4
 TEMPERATURE_SIZE = 4
@@ -33,11 +31,7 @@ class DataInputService:
                     self._measurement_repository.save(
                         MeasurementModel(
                             inspection_id=inspection_id,
-                            timestamp=datetime.utcfromtimestamp(
-                                self._convert_uint_timestamp_milis_to_float(
-                                    measurement.get("timestamp_milis")
-                                )
-                            ),
+                            ms_time=measurement.get("time"),
                             speed=measurement.get("speed"),
                             magnetic_fields=measurement.get("magnetic_fields"),
                             temperature=measurement.get("temperature"),
@@ -84,11 +78,8 @@ class DataInputService:
         temperature_data = CRCUtils.float_from_bytes(data_bytes[begin_pos:end_pos])
 
         return {
-            "timestamp_milis": time_data,
+            "time": time_data,
             "speed": speed_data,
             "magnetic_fields": magnetic_fields,
             "temperature": temperature_data,
         }
-
-    def _convert_uint_timestamp_milis_to_float(self, timestamp_uint):
-        return timestamp_uint / 1000
