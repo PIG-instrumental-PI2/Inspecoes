@@ -46,7 +46,7 @@
         "PIG_INSPECTIONS_DB_NAME": "pig-inspections"
       },
       "console": "integratedTerminal",
-      "args": ["tests/data_input/test_data_input_upload_data.py"],
+      "args": ["tests/inspection/test_inspection_create.py"],
       "justMyCode": false
     }
   ]

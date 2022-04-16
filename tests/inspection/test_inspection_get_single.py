@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 from bson.objectid import ObjectId
 from fastapi.testclient import TestClient
@@ -28,6 +30,8 @@ def inspection_mongo_mock(mocker):
                 "open": OPENED,
                 "place": PLACE,
                 "description": "",
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
             }
         return None
 
@@ -47,9 +51,11 @@ def test_success_get_inspection(mocker, inspection_mongo_mock):
     assert response_body.get("pig_id") == PIG_ID
     assert response_body.get("open") == OPENED
     assert response_body.get("place") == PLACE
+    assert response_body.get("created_at")
+    assert response_body.get("updated_at")
 
 
-def test_error_get_pigs_empty_pig_list_from_company(mocker, inspection_mongo_mock):
+def test_error_get_inspection_not_found(mocker, inspection_mongo_mock):
     # Test Request
     response = client.get(f"{API_PATH}/inexistent-inspection/", headers=HEADERS)
     response_body = response.json()

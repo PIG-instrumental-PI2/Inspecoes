@@ -1,4 +1,5 @@
-from typing import List, Optional
+from datetime import datetime
+from typing import List
 
 from libraries.mongodb_client import DatabaseClient
 from models.inspection import InspectionModel
@@ -10,8 +11,10 @@ class InspectionRepository:
         self._db_client = DatabaseClient(collection_name="inspections")
 
     def save(self, document: InspectionModel) -> InspectionModel:
-        document_id = self._db_client.save(document.dict(exclude_unset=True))
-        document.id = document_id
+        dict_doc = self._db_client.save(document.dict(exclude_unset=True))
+        document.id = dict_doc.get("_id")
+        document.created_at = datetime.isoformat(dict_doc.get("created_at"))
+        document.updated_at = datetime.isoformat(dict_doc.get("updated_at"))
         return document
 
     def update(self, document: InspectionModel) -> InspectionModel:
@@ -39,8 +42,6 @@ class InspectionRepository:
                     company_id=record.get("company_id"),
                     pig_id=record.get("pig_id"),
                     open=record.get("open"),
-                    place=record.get("place"),
-                    description=record.get("description"),
                 )
             )
         return records
@@ -49,6 +50,16 @@ class InspectionRepository:
         record = self._db_client.get(query={"_id": pig_id})
 
         if record:
+            try:
+                created_at = datetime.isoformat(record.get("created_at"))
+            except TypeError:
+                created_at = None
+
+            try:
+                updated_at = datetime.isoformat(record.get("updated_at"))
+            except TypeError:
+                updated_at = None
+
             return InspectionModel(
                 id=str(record.get("_id")),
                 name=record.get("name"),
@@ -57,6 +68,8 @@ class InspectionRepository:
                 open=record.get("open"),
                 place=record.get("place"),
                 description=record.get("description"),
+                created_at=created_at,
+                updated_at=updated_at,
             )
         else:
             raise NotFoundException("Inspeção não encontrada")

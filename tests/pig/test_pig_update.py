@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 from bson.objectid import ObjectId
 from fastapi.testclient import TestClient
@@ -26,6 +28,8 @@ def pig_mongo_mock(mocker):
                 "pig_number": "1234",
                 "company_id": COMPANY_ID,
                 "description": "",
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
             }
         return None
 

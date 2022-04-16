@@ -10,6 +10,13 @@ class PIGModel(BaseModel):
     company_id: str
     description: Optional[str]
     last_inspection: Optional[str]
+    created_at: Optional[str]
+    updated_at: Optional[str]
+
+    def dict(self, *args, **kwargs):
+        if kwargs and kwargs.get("exclude_none") is not None:
+            kwargs["exclude_none"] = True
+        return BaseModel.dict(self, *args, **kwargs)
 
 
 class PIGUpdateModel(BaseModel):

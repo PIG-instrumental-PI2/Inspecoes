@@ -39,6 +39,8 @@ def test_sucess_create_pig(mocker, pig_mongo_mock):
     assert response_body.get("name") == "pig-001"
     assert response_body.get("pig_number") == "1234"
     assert response_body.get("company_id") == "company-001"
+    assert response_body.get("created_at")
+    assert response_body.get("updated_at")
 
 
 def test_error_create_pig_missing_name(mocker, pig_mongo_mock):

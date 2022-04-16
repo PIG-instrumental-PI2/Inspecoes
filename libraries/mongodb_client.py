@@ -1,5 +1,5 @@
 import os
-from time import time
+from datetime import datetime
 from typing import List, Optional
 
 from bson.objectid import ObjectId
@@ -25,19 +25,22 @@ class DatabaseClient:
         self._database = self._db_client[DB_NAME]
         self._collection = self._database[collection_name]
 
-    def save(self, document: dict) -> Optional[str]:
+    def save(self, document: dict, track_time=True) -> Optional[str]:
         """Save (create) a document on database
 
         :param document: document content
         """
-        document["created_at"] = round(time())
-        document["updated_at"] = round(time())
+        datetime_now = datetime.utcnow()
+        if track_time == True:
+            document["created_at"] = datetime_now
+            document["updated_at"] = datetime_now
         inserted_id = self._collection.insert_one(document).inserted_id
         if inserted_id:
-            return str(inserted_id)
+            document["_id"] = str(inserted_id)
+            return document
         return None
 
-    def update(self, document: dict, query: dict) -> Optional[str]:
+    def update(self, document: dict, query: dict, track_time=True) -> Optional[str]:
         """Update a existing document on database
 
         :param document: document content
@@ -45,7 +48,8 @@ class DatabaseClient:
             document that will be replaced
         """
         query["_id"] = self._handle_id(query.get("_id"))
-        document["updated_at"] = round(time())
+        if track_time == True:
+            document["updated_at"] = datetime.utcnow()
 
         upserted_id = self._collection.update_one(query, {"$set": document}).upserted_id
         # upserted_id = self._collection.replace_one(

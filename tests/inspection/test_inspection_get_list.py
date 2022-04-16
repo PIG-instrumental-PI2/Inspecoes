@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 from bson.objectid import ObjectId
 from fastapi.testclient import TestClient
@@ -29,6 +31,8 @@ def inspection_mongo_mock(mocker):
                     "open": OPENED,
                     "place": PLACE,
                     "description": "",
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow(),
                 }
             ]
         return []

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 from bson.objectid import ObjectId
 from fastapi.testclient import TestClient
@@ -64,6 +66,8 @@ def data_mongo_mock(mocker):
                 "company_id": COMPANY_ID,
                 "description": "",
                 "last_inspection": INSPECTION_ID,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
             }
         if filter == {"_id": ObjectId(PIG_ID_2)}:
             return {
@@ -73,6 +77,8 @@ def data_mongo_mock(mocker):
                 "company_id": COMPANY_ID,
                 "description": "",
                 "last_inspection": None,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
             }
         if filter == {"_id": ObjectId(INSPECTION_ID)}:
             return {
@@ -83,6 +89,8 @@ def data_mongo_mock(mocker):
                 "open": OPENED,
                 "place": PLACE,
                 "description": "",
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
             }
         return None
 
