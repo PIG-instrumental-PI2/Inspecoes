@@ -1,7 +1,9 @@
+import datetime
 from typing import List
 
 from repositories.measurements import MeasurementRepository
 from schemas.charts import ChartsSchema
+from utils.date_utils import HoursTimedelta
 from utils.math_utils import avg
 
 
@@ -16,16 +18,21 @@ class ChartGroupService:
         speeds = []
         magnetic_fields_avg = []
         times = []
+        times_formatted = []
 
         for measurement in measurements:
             temperatures.append(measurement.temperature)
             speeds.append(measurement.speed)
             magnetic_fields_avg.append(avg(measurement.magnetic_fields))
             times.append(measurement.ms_time)
+            times_formatted.append(
+                str(HoursTimedelta(microseconds=measurement.ms_time * 1000))
+            )
 
         return ChartsSchema(
             temperatures=temperatures,
             speeds=speeds,
             magnetic_fields_avg=magnetic_fields_avg,
             times=times,
+            times_formatted=times_formatted,
         )
