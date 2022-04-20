@@ -1,6 +1,7 @@
-from libraries.crc_utils import CRC_SIZE, CRCUtils
+from libraries.crc_utils import CRCUtils
 from models.measurement import MeasurementModel
 from repositories.measurements import MeasurementRepository
+from utils.math_utils import format_float
 
 MAGNETIC_FIELDS_AMOUNT = 16
 # Sizes in byte
@@ -63,19 +64,23 @@ class DataInputService:
 
         begin_pos = end_pos
         end_pos = begin_pos + SPEED_SIZE
-        speed_data = CRCUtils.float_from_bytes(data_bytes[begin_pos:end_pos])
+        speed_data = format_float(
+            CRCUtils.float_from_bytes(data_bytes[begin_pos:end_pos])
+        )
 
         magnetic_fields = []
         for _ in range(MAGNETIC_FIELDS_AMOUNT):
             begin_pos = end_pos
             end_pos = begin_pos + MAGNETIC_FIELD_SIZE
             magnetic_fields.append(
-                CRCUtils.float_from_bytes(data_bytes[begin_pos:end_pos])
+                format_float(CRCUtils.float_from_bytes(data_bytes[begin_pos:end_pos]))
             )
 
         begin_pos = end_pos
         end_pos = begin_pos + TEMPERATURE_SIZE
-        temperature_data = CRCUtils.float_from_bytes(data_bytes[begin_pos:end_pos])
+        temperature_data = format_float(
+            CRCUtils.float_from_bytes(data_bytes[begin_pos:end_pos])
+        )
 
         return {
             "time": time_data,
