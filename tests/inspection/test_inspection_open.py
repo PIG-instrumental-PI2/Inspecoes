@@ -24,6 +24,16 @@ def inspection_mongo_mock(mocker):
         upserted_id = ObjectId(PIG_ID)
 
     def find_one(self, filter, projection=None):
+        if filter == {"_id": ObjectId(PIG_ID)}:
+            return {
+                "_id": PIG_ID,
+                "name": PIG_ID,
+                "pig_number": "1234",
+                "company_id": COMPANY_ID,
+                "description": "",
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+            }
         if filter == {"_id": ObjectId(INSPECTION_ID)}:
             return {
                 "_id": INSPECTION_ID,
@@ -45,17 +55,6 @@ def inspection_mongo_mock(mocker):
     mocker.patch("pymongo.collection.Collection.find_one", find_one)
 
 
-def test_success_close_inspection_(mocker, inspection_mongo_mock):
-    # Test Request
-    response = client.post(f"{API_PATH}/{INSPECTION_ID}/close", headers=HEADERS)
-    response_body = response.json()
-
-    # Assertions
-    assert response.status_code == 201
-    assert response_body.get("id") == INSPECTION_ID
-    assert response_body.get("open") == False
-
-
 def test_success_open_inspection(mocker, inspection_mongo_mock):
     # Test Request
     response = client.post(f"{API_PATH}/{INSPECTION_ID}/open", headers=HEADERS)
@@ -65,16 +64,6 @@ def test_success_open_inspection(mocker, inspection_mongo_mock):
     assert response.status_code == 201
     assert response_body.get("id") == INSPECTION_ID
     assert response_body.get("open") == True
-
-
-def test_error_close_inspection_inexistent(mocker, inspection_mongo_mock):
-    # Test Request
-    response = client.post(f"{API_PATH}/inexistent-inspection/close", headers=HEADERS)
-    response_body = response.json()
-
-    # Assertions
-    assert response.status_code == 404
-    assert response_body == {"error": "Inspeção não encontrada"}
 
 
 def test_error_open_inspection_inexistent(mocker, inspection_mongo_mock):

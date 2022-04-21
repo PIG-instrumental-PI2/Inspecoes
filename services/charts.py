@@ -1,60 +1,63 @@
 from typing import List
 
-from repositories.measurements import MeasurementRepository
+from repositories.processed_measurements import ProcessedMeasurementRepository
 from schemas.charts import ChartsSchema
 from services.data_input import MAGNETIC_FIELDS_COUNT
-from utils.date_utils import HoursTimedelta
-from utils.math_utils import avg, cal_new_pos, format_float
 
 
 class ChartGroupService:
     def __init__(self) -> None:
-        self._measurements_repository = MeasurementRepository()
+        self._processed_measurements_repository = ProcessedMeasurementRepository()
 
-    def get_charts(self, inspection_id: str) -> List[ChartsSchema]:
-        measurements = self._measurements_repository.get_by_inspection(inspection_id)
+    def get_measurements(
+        self, inspection_id: str, start_time: int = None, finish_time: int = None
+    ) -> ChartsSchema:
+        measurements = self._processed_measurements_repository.get_by_inspection(
+            inspection_id, start_time, finish_time
+        )
 
         temperatures = []
         speeds = []
         magnetic_fields = {
             f"magnetic_fields_{field}": [] for field in range(MAGNETIC_FIELDS_COUNT)
         }
+        clustered_magnetic_fields = {
+            f"clustered_magnetic_fields_{field}": []
+            for field in range(MAGNETIC_FIELDS_COUNT)
+        }
         magnetic_fields_avg = []
         times = []
-        times_formatted = []
+        formatted_times = []
         positions = []
-        current_pos = 0
-        measurements_last = len(measurements) - 1
 
-        for index, measurement in enumerate(measurements):
+        for measurement in measurements:
             temperatures.append(measurement.temperature)
-            speeds.append(measurement.speed)
-            magnetic_fields_avg.append(avg(measurement.magnetic_fields))
-            for field, key in enumerate(magnetic_fields.keys()):
-                magnetic_fields[key].append(measurement.magnetic_fields[field])
             times.append(measurement.ms_time)
-            times_formatted.append(
-                str(HoursTimedelta(microseconds=measurement.ms_time * 1000))
+            speeds.append(measurement.speed)
+            magnetic_fields_avg.append(measurement.magnetic_fields_avg)
+            magnetic_fields = self._append_fields_into_dict(
+                magnetic_fields, measurement.magnetic_fields
             )
-            positions.append(current_pos)
-
-            current_pos = format_float(
-                cal_new_pos(
-                    initial_pos=current_pos,
-                    begin_time_ms=measurements[index].ms_time,
-                    final_time_ms=measurements[
-                        min(index + 1, measurements_last)
-                    ].ms_time,
-                    speed=measurements[index].speed,
-                )
+            clustered_magnetic_fields = self._append_fields_into_dict(
+                clustered_magnetic_fields, measurement.clustered_magnetic_fields
             )
+            # for field, key in enumerate(magnetic_fields.keys()):
+            #     magnetic_fields[key].append(measurement.magnetic_fields[field])
+            formatted_times.append(measurement.formatted_time)
+            positions.append(measurement.position)
 
         return ChartsSchema(
+            times=times,
             temperatures=temperatures,
             speeds=speeds,
             magnetic_fields_avg=magnetic_fields_avg,
-            times=times,
-            times_formatted=times_formatted,
+            formatted_times=formatted_times,
             positions=positions,
             **magnetic_fields,
+            **clustered_magnetic_fields,
         )
+
+    def _append_fields_into_dict(self, fields_dict: dict, fields_array: list):
+        for field, key in enumerate(fields_dict.keys()):
+            fields_dict[key].append(fields_array[field])
+        return fields_dict

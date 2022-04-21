@@ -5,6 +5,7 @@ from fastapi import APIRouter, status
 from libraries.crc_utils import CRCUtils
 from models.inspection import InspectionModel
 from schemas.inspection import InspectionCreationRequest, InspectionDeleteResponse
+from services.data_input import DataInputService
 from services.inspection import InspectionService
 from services.pig import PIGService
 
@@ -23,7 +24,7 @@ def create_inspection(pig_body: InspectionCreationRequest):
         place=pig_body.place,
         description=pig_body.description,
     )
-    pig_service.update(pig_record.id, last_inspection=inspection_record.id)
+    pig_service.update(pig_record.id, current_inspection=inspection_record.id)
     return inspection_record
 
 
@@ -48,22 +49,18 @@ def get_inspection(inspection_id: str):
 
 
 @router.post(
-    "/{inspection_id}/close",
-    status_code=status.HTTP_201_CREATED,
-    response_model=InspectionModel,
-)
-def close_inspection(inspection_id: str):
-    inspection_record = InspectionService().close(inspection_id)
-    return inspection_record
-
-
-@router.post(
     "/{inspection_id}/open",
     status_code=status.HTTP_201_CREATED,
     response_model=InspectionModel,
 )
-def close_inspection(inspection_id: str):
-    inspection_record = InspectionService().open(inspection_id)
+def open_inspection(inspection_id: str):
+    pig_service = PIGService()
+
+    inspection_record = InspectionService().get_by_id(inspection_id)
+    pig_record = pig_service.get_by_id(pig_id=inspection_record.pig_id)
+    pig_service.update(pig_record.id, current_inspection=inspection_record.id)
+    inspection_record = InspectionService().open(inspection_record)
+
     return inspection_record
 
 

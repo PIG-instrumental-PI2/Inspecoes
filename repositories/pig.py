@@ -57,7 +57,7 @@ class PIGRepository:
                 name=record.get("name"),
                 company_id=record.get("company_id"),
                 description=record.get("description"),
-                last_inspection=record.get("last_inspection"),
+                current_inspection=record.get("current_inspection"),
                 created_at=created_at,
                 updated_at=updated_at,
             )

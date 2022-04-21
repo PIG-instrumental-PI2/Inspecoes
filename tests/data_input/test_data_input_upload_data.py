@@ -65,7 +65,7 @@ def data_mongo_mock(mocker):
                 "pig_number": "1234",
                 "company_id": COMPANY_ID,
                 "description": "",
-                "last_inspection": INSPECTION_ID,
+                "current_inspection": INSPECTION_ID,
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow(),
             }
@@ -76,7 +76,7 @@ def data_mongo_mock(mocker):
                 "pig_number": "1235",
                 "company_id": COMPANY_ID,
                 "description": "",
-                "last_inspection": None,
+                "current_inspection": None,
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow(),
             }

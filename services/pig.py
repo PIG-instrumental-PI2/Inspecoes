@@ -25,14 +25,14 @@ class PIGService:
         name: str = None,
         company: str = None,
         description: str = None,
-        last_inspection: str = None,
+        current_inspection: str = None,
     ) -> PIGModel:
         pig_changes = PIGUpdateModel(
             id=pig_id,
             name=name,
             company_id=company,
             description=description,
-            last_inspection=last_inspection,
+            current_inspection=current_inspection,
         )
         self._pig_repository.update(pig_changes)
         return self.get_by_id(pig_id)

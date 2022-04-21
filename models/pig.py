@@ -9,7 +9,7 @@ class PIGModel(BaseModel):
     name: str
     company_id: str
     description: Optional[str]
-    last_inspection: Optional[str]
+    current_inspection: Optional[str]
     created_at: Optional[str]
     updated_at: Optional[str]
 
@@ -24,4 +24,4 @@ class PIGUpdateModel(BaseModel):
     name: Optional[str]
     company_id: Optional[str]
     description: Optional[str]
-    last_inspection: Optional[str]
+    current_inspection: Optional[str]
