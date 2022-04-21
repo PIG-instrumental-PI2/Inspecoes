@@ -4,20 +4,20 @@ from pydantic import BaseModel
 
 
 class MeasurementModel(BaseModel):
-    inspection_id: str
-    ms_time: int
-    temperature: float
-    speed: float
-    magnetic_fields: List[float]
+    inspection_id: Optional[str]
+    ms_time: Optional[int]
+    temperature: Optional[float]
+    speed: Optional[float]
+    magnetic_fields: Optional[List[float]]
 
 
 class ProcessedMeasurementsModel(BaseModel):
-    inspection_id: str
-    ms_time: int
-    formatted_time: str
-    position: float
-    temperature: float
-    speed: float
-    magnetic_fields: List[float]
-    magnetic_fields_avg: float
+    inspection_id: Optional[str]
+    ms_time: Optional[int]
+    formatted_time: Optional[str]
+    position: Optional[float]
+    temperature: Optional[float]
+    speed: Optional[float]
+    magnetic_fields: Optional[List[float]]
+    magnetic_fields_avg: Optional[float]
     clustered_magnetic_fields: Optional[List[int]] = []

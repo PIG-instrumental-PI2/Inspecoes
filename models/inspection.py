@@ -5,10 +5,10 @@ from pydantic import BaseModel
 
 class InspectionModel(BaseModel):
     id: Optional[str]
-    name: str
-    company_id: str
-    pig_id: str
-    open: bool
+    name: Optional[str]
+    company_id: Optional[str]
+    pig_id: Optional[str]
+    open: Optional[bool]
     place: Optional[str]
     description: Optional[str]
     created_at: Optional[str]

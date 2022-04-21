@@ -5,9 +5,9 @@ from pydantic import BaseModel
 
 class PIGModel(BaseModel):
     id: Optional[str]
-    pig_number: str
-    name: str
-    company_id: str
+    pig_number: Optional[str]
+    name: Optional[str]
+    company_id: Optional[str]
     description: Optional[str]
     current_inspection: Optional[str]
     created_at: Optional[str]
