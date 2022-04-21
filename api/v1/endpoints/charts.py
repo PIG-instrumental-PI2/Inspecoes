@@ -7,7 +7,14 @@ router = APIRouter()
 
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=ChartsSchema)
-def get_chart(inspection_id: str):
-    charts_response = ChartGroupService().get_charts(inspection_id=inspection_id)
+def get_measurements(inspection_id: str):
+    charts_response = ChartGroupService().get_measurements(inspection_id=inspection_id)
+
+    return charts_response
+
+
+@router.get("/clusters", status_code=status.HTTP_200_OK, response_model=ChartsSchema)
+def get_clusters(inspection_id: str):
+    charts_response = ChartGroupService().get_clusters(inspection_id=inspection_id)
 
     return charts_response

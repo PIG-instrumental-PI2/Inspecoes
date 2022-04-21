@@ -11,7 +11,7 @@ class ChartGroupService:
     def __init__(self) -> None:
         self._measurements_repository = MeasurementRepository()
 
-    def get_charts(self, inspection_id: str) -> List[ChartsSchema]:
+    def get_measurements(self, inspection_id: str) -> List[ChartsSchema]:
         measurements = self._measurements_repository.get_by_inspection(inspection_id)
 
         temperatures = []
