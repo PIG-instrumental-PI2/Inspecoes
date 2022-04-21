@@ -12,7 +12,7 @@ HEADERS = dict()
 
 client = TestClient(app)
 
-API_PATH = "/api/v1/inspections"
+API_PATH = "/api/v1/data-input/{pig_id}/close"
 INSPECTION_ID = "a43923db765b869af8577c7c"
 PIG_ID = "62439cf9f7d653a9088ba15a"
 COMPANY_ID = "company-001"
@@ -39,6 +39,7 @@ def inspection_mongo_mock(mocker):
                 "description": "",
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow(),
+                "current_inspection": INSPECTION_ID,
             }
         if collection_name == "inspections" and filter == {
             "_id": ObjectId(INSPECTION_ID)
@@ -81,12 +82,15 @@ def data_mongo_mock(mocker):
     mocker.patch("pymongo.collection.Collection.find", find)
 
 
-def test_success_close_inspection_(mocker, inspection_mongo_mock, data_mongo_mock):
+def test_success_data_input_close_inspection(
+    mocker, inspection_mongo_mock, data_mongo_mock
+):
     #### Spies
     save_processed_spy = mocker.spy(ProcessedMeasurementRepository, "save")
 
     #### Test Request
-    response = client.post(f"{API_PATH}/{INSPECTION_ID}/close", headers=HEADERS)
+    api_path = API_PATH.format(pig_id=PIG_ID)
+    response = client.post(api_path, headers=HEADERS)
     response_body = response.json()
 
     #### Assertions
@@ -100,11 +104,12 @@ def test_success_close_inspection_(mocker, inspection_mongo_mock, data_mongo_moc
     assert response_body.get("clusters")
 
 
-def test_error_close_inspection_inexistent(mocker, inspection_mongo_mock):
+def test_error_data_input_close_inspection_inexistent(mocker, inspection_mongo_mock):
     # Test Request
-    response = client.post(f"{API_PATH}/inexistent-inspection/close", headers=HEADERS)
+    api_path = API_PATH.format(pig_id="inexistent-pig")
+    response = client.post(api_path, headers=HEADERS)
     response_body = response.json()
 
     # Assertions
     assert response.status_code == 404
-    assert response_body == {"error": "Inspeção não encontrada"}
+    assert response_body == {"error": "PIG não encontrado"}
