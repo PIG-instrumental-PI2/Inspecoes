@@ -68,6 +68,7 @@ class InspectionRepository:
                 open=record.get("open"),
                 place=record.get("place"),
                 description=record.get("description"),
+                clusters=record.get("clusters"),
                 created_at=created_at,
                 updated_at=updated_at,
             )
