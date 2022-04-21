@@ -2,6 +2,7 @@ from typing import List
 
 from models.inspection import InspectionModel, InspectionUpdateModel
 from repositories.inspection import InspectionRepository
+from utils.math_utils import format_float
 
 
 class InspectionService:
@@ -34,8 +35,11 @@ class InspectionService:
     def get_by_id(self, inspection_id: str) -> InspectionModel:
         return self._inspection_repository.get_by_id(inspection_id)
 
-    def close(self, inspection: InspectionModel) -> InspectionModel:
+    def close(
+        self, inspection: InspectionModel, clusters: List[list] = []
+    ) -> InspectionModel:
         inspection.open = False
+        inspection.clusters = clusters
         updated_inspection = self._inspection_repository.update(inspection)
         return updated_inspection
 

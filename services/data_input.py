@@ -1,11 +1,15 @@
-from typing import List
+import pickle
+from typing import List, Tuple
 
 import numpy as np
 from sklearn.cluster import KMeans
 
 from libraries.crc_utils import CRCUtils
+from models.cluster_model import ClusterModel
 from models.measurement import MeasurementModel, ProcessedMeasurementsModel
+from repositories.cluster_model import ClusterModelRepository
 from repositories.measurements import MeasurementRepository
+from repositories.processed_measurements import ProcessedMeasurementRepository
 from utils.date_utils import HoursTimedelta
 from utils.math_utils import avg, cal_new_pos, format_float
 
@@ -27,6 +31,8 @@ CLUSTERS_COUNT = 5
 class DataInputService:
     def __init__(self) -> None:
         self._measurements_repository = MeasurementRepository()
+        self._processed_measurements_repository = ProcessedMeasurementRepository()
+        self._cluster_repository = ClusterModelRepository()
 
     def upload_data(self, inspection_id: str, encoded_data: bytes) -> bool:
         corrupted = False
@@ -53,38 +59,93 @@ class DataInputService:
         return corrupted
 
     def post_processing(self, inspection_id):
-        """Peform post processing on inspection data"""
-        processed_measurements = self._transform_measurements(inspection_id)
-        clustered_magnetic_fields_0 = self._clustering(
-            processed_measurements.magnetic_fields_0
+        """Peform post processing on inspection data and save on database"""
+        measurements = self._measurements_repository.get_by_inspection(inspection_id)
+        clusters, clustered_fields_by_time = self._clustering(
+            inspection_id, measurements
+        )
+        self._process_and_save_measurements(
+            inspection_id=inspection_id,
+            measurements=measurements,
+            clustered_fields_by_time=clustered_fields_by_time,
         )
 
-    def _transform_measurements(self, inspection_id: str):
-        measurements = self._measurements_repository.get_by_inspection(inspection_id)
+        return clusters
 
-        temperatures = []
-        speeds = []
-        magnetic_fields = {
-            f"magnetic_fields_{field}": [] for field in range(MAGNETIC_FIELDS_COUNT)
-        }
+    def _clustering(
+        self, inspection_id: str, raw_measurements: List[MeasurementModel]
+    ) -> Tuple[List[float], dict]:
+        # Prepare magnetic fields data
         magnetic_fields_avg = []
-        times = []
-        times_formatted = []
-        positions = []
+        for measurement in raw_measurements:
+            magnetic_fields_avg.append(avg(measurement.magnetic_fields))
+
+        magnetic_fields_avg: np.array = np.array(magnetic_fields_avg).reshape(-1, 1)
+        kmeans = KMeans(n_clusters=CLUSTERS_COUNT, random_state=42).fit(
+            magnetic_fields_avg
+        )
+
+        # Save pickle
+        pickled_data = pickle.dumps(kmeans)
+        self._cluster_repository.save(
+            ClusterModel(inspection_id=inspection_id, pickled_data=pickled_data)
+        )
+
+        # Make Predictions
+        try:
+            centers = kmeans.cluster_centers_.tolist()
+            centers = list(
+                map(
+                    lambda center_coordinates: [
+                        format_float(cord) for cord in center_coordinates
+                    ],
+                    centers,
+                )
+            )
+        except:
+            centers = []
+
+        try:
+            cluster_data = dict()
+            for measurement in raw_measurements:
+                measurement_fields: np.array = np.array(
+                    measurement.magnetic_fields
+                ).reshape(-1, 1)
+                cluster_data[measurement.ms_time] = kmeans.predict(
+                    measurement_fields
+                ).tolist()
+        except:
+            cluster_data = dict()
+
+        return centers, cluster_data
+
+    def _process_and_save_measurements(
+        self,
+        inspection_id: str,
+        measurements: List[MeasurementModel],
+        clustered_fields_by_time: dict,
+    ):
         current_pos = 0
         measurements_last = len(measurements) - 1
 
         for index, measurement in enumerate(measurements):
-            temperatures.append(measurement.temperature)
-            speeds.append(measurement.speed)
-            magnetic_fields_avg.append(avg(measurement.magnetic_fields))
-            for field, key in enumerate(magnetic_fields.keys()):
-                magnetic_fields[key].append(measurement.magnetic_fields[field])
-            times.append(measurement.ms_time)
-            times_formatted.append(
-                str(HoursTimedelta(microseconds=measurement.ms_time * 1000))
+            self._processed_measurements_repository.save(
+                ProcessedMeasurementsModel(
+                    inspection_id=inspection_id,
+                    ms_time=measurement.ms_time,
+                    formatted_time=str(
+                        HoursTimedelta(microseconds=measurement.ms_time * 1000)
+                    ),
+                    position=current_pos,
+                    temperature=measurement.temperature,
+                    speed=measurement.speed,
+                    magnetic_fields=measurement.magnetic_fields,
+                    magnetic_fields_avg=avg(measurement.magnetic_fields),
+                    clustered_magnetic_fields=clustered_fields_by_time.get(
+                        measurement.ms_time
+                    ),
+                )
             )
-            positions.append(current_pos)
 
             current_pos = format_float(
                 cal_new_pos(
@@ -96,29 +157,6 @@ class DataInputService:
                     speed=measurements[index].speed,
                 )
             )
-
-        return ProcessedMeasurementsModel(
-            temperatures=temperatures,
-            speeds=speeds,
-            magnetic_fields_avg=magnetic_fields_avg,
-            times=times,
-            times_formatted=times_formatted,
-            positions=positions,
-            **magnetic_fields,
-        )
-
-    def _clustering(self, magnetic_field_one_dimension: List[float]):
-        magnetic_field_one_dimension: np.array = np.array(
-            magnetic_field_one_dimension
-        ).reshape(-1, 1)
-        kmeans = KMeans(n_clusters=CLUSTERS_COUNT, random_state=42).fit(
-            magnetic_field_one_dimension
-        )
-        # centers = kmeans.cluster_centers_
-        # data_test = magnetic_field_one_dimension[:5, :].reshape(-1, 1)
-        # kmeans_predicted = kmeans.predict(data_test)
-
-        # Save pickle
 
     def _get_measurements(self, data_bytes: bytes):
         begin = 0

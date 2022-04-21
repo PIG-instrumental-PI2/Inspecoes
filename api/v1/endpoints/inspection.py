@@ -57,12 +57,13 @@ def close_inspection(inspection_id: str):
     """Closes an inspection and start post processing"""
     pig_service = PIGService()
     data_service = DataInputService()
+    inspection_service = InspectionService()
 
-    inspection_record = InspectionService().get_by_id(inspection_id)
+    inspection_record = inspection_service.get_by_id(inspection_id)
     pig_record = pig_service.get_by_id(pig_id=inspection_record.pig_id)
     pig_service.update(pig_record.id, last_inspection=None)
-    inspection_record = InspectionService().close(inspection_record)
-    data_service.post_processing(inspection_id)
+    clusters = data_service.post_processing(inspection_id)
+    inspection_record = inspection_service.close(inspection_record, clusters=clusters)
 
     return inspection_record
 

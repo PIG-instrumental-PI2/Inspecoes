@@ -5,11 +5,11 @@ from pydantic import BaseModel
 
 ################# Responses #################
 class ChartsSchema(BaseModel):
+    times: List[int]
     temperatures: List[float]
     speeds: List[float]
     magnetic_fields_avg: List[float]
-    times: List[int]
-    times_formatted: List[str]
+    formatted_times: List[str]
     positions: List[float]
     magnetic_fields_0: List[float] = []
     magnetic_fields_1: List[float] = []

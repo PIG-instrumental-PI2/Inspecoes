@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -13,6 +13,7 @@ class InspectionModel(BaseModel):
     description: Optional[str]
     created_at: Optional[str]
     updated_at: Optional[str]
+    clusters: Optional[List[list]]
 
     def dict(self, *args, **kwargs):
         if kwargs and kwargs.get("exclude_none") is not None:
