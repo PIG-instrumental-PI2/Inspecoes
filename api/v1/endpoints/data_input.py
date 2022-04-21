@@ -60,7 +60,7 @@ def close_inspection(pig_id: str):
     pig_record = pig_service.get_by_id(pig_id=pig_id)
     inspection_id = pig_record.current_inspection
     inspection_record = inspection_service.get_by_id(inspection_id)
-    pig_service.update(pig_record.id, current_inspection=None)
+    pig_service.update(pig_record.id, current_inspection="")
     clusters = data_service.post_processing(inspection_id)
     inspection_record = inspection_service.close(inspection_record, clusters=clusters)
 

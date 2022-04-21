@@ -5,5 +5,5 @@ from pydantic import BaseModel
 
 class ClusterModel(BaseModel):
     id: Optional[str]
-    inspection_id: str
-    pickled_data: bytes
+    inspection_id: Optional[str]
+    pickled_data: Optional[bytes]
