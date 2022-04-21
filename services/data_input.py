@@ -3,7 +3,7 @@ from models.measurement import MeasurementModel
 from repositories.measurements import MeasurementRepository
 from utils.math_utils import format_float
 
-MAGNETIC_FIELDS_AMOUNT = 16
+MAGNETIC_FIELDS_COUNT = 16
 # Sizes in byte
 TIME_SIZE = 4
 SPEED_SIZE = 4
@@ -12,7 +12,7 @@ TEMPERATURE_SIZE = 4
 READING_SIZE = (
     TIME_SIZE
     + SPEED_SIZE
-    + MAGNETIC_FIELD_SIZE * MAGNETIC_FIELDS_AMOUNT
+    + MAGNETIC_FIELD_SIZE * MAGNETIC_FIELDS_COUNT
     + TEMPERATURE_SIZE
 )
 
@@ -69,7 +69,7 @@ class DataInputService:
         )
 
         magnetic_fields = []
-        for _ in range(MAGNETIC_FIELDS_AMOUNT):
+        for _ in range(MAGNETIC_FIELDS_COUNT):
             begin_pos = end_pos
             end_pos = begin_pos + MAGNETIC_FIELD_SIZE
             magnetic_fields.append(

@@ -3,6 +3,7 @@ from typing import List
 
 from repositories.measurements import MeasurementRepository
 from schemas.charts import ChartsSchema
+from services.data_input import MAGNETIC_FIELDS_COUNT
 from utils.date_utils import HoursTimedelta
 from utils.math_utils import avg, cal_new_pos, format_float
 
@@ -16,6 +17,9 @@ class ChartGroupService:
 
         temperatures = []
         speeds = []
+        magnetic_fields = {
+            f"magnetic_fields_{field}": [] for field in range(MAGNETIC_FIELDS_COUNT)
+        }
         magnetic_fields_avg = []
         times = []
         times_formatted = []
@@ -27,6 +31,8 @@ class ChartGroupService:
             temperatures.append(measurement.temperature)
             speeds.append(measurement.speed)
             magnetic_fields_avg.append(avg(measurement.magnetic_fields))
+            for field, key in enumerate(magnetic_fields.keys()):
+                magnetic_fields[key].append(measurement.magnetic_fields[field])
             times.append(measurement.ms_time)
             times_formatted.append(
                 str(HoursTimedelta(microseconds=measurement.ms_time * 1000))
@@ -51,4 +57,5 @@ class ChartGroupService:
             times=times,
             times_formatted=times_formatted,
             positions=positions,
+            **magnetic_fields,
         )

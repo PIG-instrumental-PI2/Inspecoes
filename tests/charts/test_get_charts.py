@@ -60,6 +60,8 @@ def test_success_get_inspection_charts(mocker, data_mongo_mock):
     assert response_body.get("temperatures")[0] == 41.6044
     assert response_body.get("speeds")[0] == 3.7181
     assert response_body.get("magnetic_fields_avg")[0] == 2.4826
+    assert response_body.get("magnetic_fields_0")[0] == 2.4939
+    assert response_body.get("magnetic_fields_15")[0] == 2.4723
     assert response_body.get("times")[0] == 184201
     assert response_body.get("times_formatted")[0] == "0:3:4:201"
 
@@ -121,5 +123,7 @@ def test_success_get_inspection_charts_100_measurements(
     assert response_body.get("temperatures")[99] == 41.6044
     assert response_body.get("speeds")[99] == 3.7181
     assert response_body.get("magnetic_fields_avg")[99] == 2.4826
+    assert response_body.get("magnetic_fields_0")[99] == 2.4939
+    assert response_body.get("magnetic_fields_15")[99] == 2.4723
     assert response_body.get("times")[99] == 204001
     assert response_body.get("times_formatted")[99] == "0:3:24:1"
