@@ -12,3 +12,9 @@ def avg(numbers: List):
         sum(numbers) / len(numbers),
         FLOAT_DECIMAIS,
     )
+
+
+def cal_new_pos(initial_pos, begin_time_ms, final_time_ms, speed):
+    """Calcula nova posicao do PIG baseando-se na leitura anterior e atual"""
+    delta_time_secs = (final_time_ms - begin_time_ms) / 1000
+    return initial_pos + speed * delta_time_secs

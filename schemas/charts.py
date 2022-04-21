@@ -10,3 +10,4 @@ class ChartsSchema(BaseModel):
     magnetic_fields_avg: List[float]
     times: List[int]
     times_formatted: List[str]
+    positions: List[float]

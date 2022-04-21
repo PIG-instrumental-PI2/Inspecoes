@@ -12,6 +12,8 @@ api_router.include_router(
     inspection_router, prefix="/inspections", tags=["Inspections"]
 )
 api_router.include_router(
-    charts_router, prefix="/inspections/{inspection_id}/charts", tags=["Charts"]
+    charts_router,
+    prefix="/inspections/{inspection_id}/measurements",
+    tags=["Chart Measurements"],
 )
 api_router.include_router(data_input_router, prefix="/data-input", tags=["Data Input"])

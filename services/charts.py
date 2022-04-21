@@ -4,7 +4,7 @@ from typing import List
 from repositories.measurements import MeasurementRepository
 from schemas.charts import ChartsSchema
 from utils.date_utils import HoursTimedelta
-from utils.math_utils import avg
+from utils.math_utils import avg, cal_new_pos, format_float
 
 
 class ChartGroupService:
@@ -19,14 +19,29 @@ class ChartGroupService:
         magnetic_fields_avg = []
         times = []
         times_formatted = []
+        positions = []
+        current_pos = 0
+        measurements_last = len(measurements) - 1
 
-        for measurement in measurements:
+        for index, measurement in enumerate(measurements):
             temperatures.append(measurement.temperature)
             speeds.append(measurement.speed)
             magnetic_fields_avg.append(avg(measurement.magnetic_fields))
             times.append(measurement.ms_time)
             times_formatted.append(
                 str(HoursTimedelta(microseconds=measurement.ms_time * 1000))
+            )
+            positions.append(current_pos)
+
+            current_pos = format_float(
+                cal_new_pos(
+                    initial_pos=current_pos,
+                    begin_time_ms=measurements[index].ms_time,
+                    final_time_ms=measurements[
+                        min(index + 1, measurements_last)
+                    ].ms_time,
+                    speed=measurements[index].speed,
+                )
             )
 
         return ChartsSchema(
@@ -35,4 +50,5 @@ class ChartGroupService:
             magnetic_fields_avg=magnetic_fields_avg,
             times=times,
             times_formatted=times_formatted,
+            positions=positions,
         )
