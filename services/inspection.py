@@ -34,13 +34,12 @@ class InspectionService:
     def get_by_id(self, inspection_id: str) -> InspectionModel:
         return self._inspection_repository.get_by_id(inspection_id)
 
-    def close(self, inspection_id: str) -> InspectionModel:
-        inspection = self.get_by_id(inspection_id)
+    def close(self, inspection: InspectionModel) -> InspectionModel:
+        """Closes an inspection and start post processing"""
         inspection.open = False
         return self._inspection_repository.update(inspection)
 
-    def open(self, inspection_id: str) -> InspectionModel:
-        inspection = self.get_by_id(inspection_id)
+    def open(self, inspection: InspectionModel) -> InspectionModel:
         inspection.open = True
         return self._inspection_repository.update(inspection)
 

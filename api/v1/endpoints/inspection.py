@@ -53,7 +53,13 @@ def get_inspection(inspection_id: str):
     response_model=InspectionModel,
 )
 def close_inspection(inspection_id: str):
-    inspection_record = InspectionService().close(inspection_id)
+    pig_service = PIGService()
+
+    inspection_record = InspectionService().get_by_id(inspection_id)
+    pig_record = pig_service.get_by_id(pig_id=inspection_record.pig_id)
+    pig_service.update(pig_record.id, last_inspection=None)
+    inspection_record = InspectionService().close(inspection_record)
+
     return inspection_record
 
 
@@ -62,8 +68,14 @@ def close_inspection(inspection_id: str):
     status_code=status.HTTP_201_CREATED,
     response_model=InspectionModel,
 )
-def close_inspection(inspection_id: str):
-    inspection_record = InspectionService().open(inspection_id)
+def open_inspection(inspection_id: str):
+    pig_service = PIGService()
+
+    inspection_record = InspectionService().get_by_id(inspection_id)
+    pig_record = pig_service.get_by_id(pig_id=inspection_record.pig_id)
+    pig_service.update(pig_record.id, last_inspection=inspection_record.id)
+    inspection_record = InspectionService().open(inspection_record)
+
     return inspection_record
 
 

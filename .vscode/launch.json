@@ -46,7 +46,7 @@
         "PIG_INSPECTIONS_DB_NAME": "pig-inspections"
       },
       "console": "integratedTerminal",
-      "args": ["tests/charts/test_get_clusters.py"],
+      "args": ["tests/inspection/test_inspection_state.py"],
       "justMyCode": false
     }
   ]

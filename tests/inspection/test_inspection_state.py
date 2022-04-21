@@ -24,6 +24,16 @@ def inspection_mongo_mock(mocker):
         upserted_id = ObjectId(PIG_ID)
 
     def find_one(self, filter, projection=None):
+        if filter == {"_id": ObjectId(PIG_ID)}:
+            return {
+                "_id": PIG_ID,
+                "name": PIG_ID,
+                "pig_number": "1234",
+                "company_id": COMPANY_ID,
+                "description": "",
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+            }
         if filter == {"_id": ObjectId(INSPECTION_ID)}:
             return {
                 "_id": INSPECTION_ID,
