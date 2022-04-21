@@ -9,9 +9,11 @@ class ChartGroupService:
     def __init__(self) -> None:
         self._processed_measurements_repository = ProcessedMeasurementRepository()
 
-    def get_measurements(self, inspection_id: str) -> ChartsSchema:
+    def get_measurements(
+        self, inspection_id: str, start_time: int = None, finish_time: int = None
+    ) -> ChartsSchema:
         measurements = self._processed_measurements_repository.get_by_inspection(
-            inspection_id
+            inspection_id, start_time, finish_time
         )
 
         temperatures = []

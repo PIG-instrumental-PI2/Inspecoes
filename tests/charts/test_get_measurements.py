@@ -39,6 +39,11 @@ MAGNETIC_FIELDS = [
 ]
 CLUSTERED_FIELDS = [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3]
 CLUSTERS = [[2.4826], [2.4821], [2.4824], [2.4818], [2.4831]]
+MIN_TIME = 184201
+MEASUREMENTS_FREQUENCY = 5
+MEASUREMENTS_PERIOD = 1000 / MEASUREMENTS_FREQUENCY
+MEASUREMENTS_COUNT = 100
+MAX_TIME = int(MIN_TIME + (MEASUREMENTS_PERIOD * (MEASUREMENTS_COUNT - 1)))  # 204001
 
 
 @pytest.fixture()
@@ -80,8 +85,8 @@ def data_mongo_mock(mocker):
                 {
                     "_id": ObjectId("625b1b5b78c74a4d95fadb2f"),
                     "inspection_id": "625b1b5178c74a4d95fad789",
-                    "ms_time": 184201,
-                    "formatted_time": str(HoursTimedelta(microseconds=184201 * 1000)),
+                    "ms_time": MIN_TIME,
+                    "formatted_time": str(HoursTimedelta(microseconds=MIN_TIME * 1000)),
                     "speed": 3.7181,
                     "magnetic_fields_avg": avg(MAGNETIC_FIELDS),
                     "magnetic_fields": MAGNETIC_FIELDS,
@@ -107,7 +112,7 @@ def test_success_get_inspection_charts(mocker, inspection_mongo_mock, data_mongo
     assert response_body.get("temperatures")[0] == 41.6044
     assert response_body.get("speeds")[0] == 3.7181
     assert response_body.get("magnetic_fields_avg")[0] == 2.4826
-    assert response_body.get("times")[0] == 184201
+    assert response_body.get("times")[0] == MIN_TIME
     assert response_body.get("formatted_times")[0] == "00:03:04:201"
     assert response_body.get("clusters") == CLUSTERS
     for field_index in range(16):
@@ -119,15 +124,24 @@ def test_success_get_inspection_charts(mocker, inspection_mongo_mock, data_mongo
         assert clustered_field == CLUSTERED_FIELDS[field_index]
 
 
-#################### 100 measurements ####################
+#################### Test several measurements ####################
 @pytest.fixture()
-def data_mongo_mock_100_measurements(mocker):
+def data_mongo_mock_several_measurements(mocker):
     def find(self, filter, projection=None):
         measurements = []
-        ms_current_time = 184201
-        frequency_hz = 5
-        period_tick = 1000 / frequency_hz
-        for _ in range(100):
+        ms_current_time = MIN_TIME
+        records_count = MEASUREMENTS_COUNT
+        # Time filter example
+        # {"ms_time": {"$gte": start_time, "$lte": finish_time}}
+        start_time = filter.get("ms_time", dict()).get("$gte", MIN_TIME)
+        finish_time = filter.get("ms_time", dict()).get("$lte", MAX_TIME)
+
+        while (
+            records_count
+            and ms_current_time >= start_time
+            and ms_current_time <= finish_time
+        ):
+            records_count -= 1
             measurements.append(
                 {
                     "_id": ObjectId("625b1b5b78c74a4d95fadb2f"),
@@ -144,15 +158,16 @@ def data_mongo_mock_100_measurements(mocker):
                     "position": 0,
                 }
             )
-            ms_current_time += period_tick
+            ms_current_time += MEASUREMENTS_PERIOD
 
         return measurements
 
     mocker.patch("pymongo.collection.Collection.find", find)
 
 
+#################### Tests with time filters ####################
 def test_success_get_inspection_charts_100_measurements(
-    mocker, inspection_mongo_mock, data_mongo_mock_100_measurements
+    mocker, inspection_mongo_mock, data_mongo_mock_several_measurements
 ):
     # Test Request
     api_path = API_PATH.format(inspection_id=INSPECTION_ID)
@@ -161,11 +176,11 @@ def test_success_get_inspection_charts_100_measurements(
 
     # Assertions
     assert response.status_code == 200
-    assert len(response_body.get("temperatures")) == 100
+    assert len(response_body.get("temperatures")) == MEASUREMENTS_COUNT
     assert response_body.get("temperatures")[99] == 41.6044
     assert response_body.get("speeds")[99] == 3.7181
     assert response_body.get("magnetic_fields_avg")[99] == 2.4826
-    assert response_body.get("times")[99] == 204001
+    assert response_body.get("times")[99] == MAX_TIME
     assert response_body.get("formatted_times")[99] == "00:03:24:001"
     assert response_body.get("clusters") == CLUSTERS
     for field_index in range(16):
@@ -175,3 +190,73 @@ def test_success_get_inspection_charts_100_measurements(
         ]
         assert field == MAGNETIC_FIELDS[field_index]
         assert clustered_field == CLUSTERED_FIELDS[field_index]
+
+
+def test_success_get_inspection_charts_100_measurements_time_filtered_complete_list(
+    mocker, inspection_mongo_mock, data_mongo_mock_several_measurements
+):
+    # Test Request
+    api_path = API_PATH.format(inspection_id=INSPECTION_ID)
+    response = client.get(f"{api_path}?start_time={MIN_TIME}&finish_time={MAX_TIME}")
+    response_body = response.json()
+
+    # Assertions
+    assert response.status_code == 200
+    assert len(response_body.get("temperatures")) == MEASUREMENTS_COUNT
+
+
+def test_success_get_inspection_charts_100_measurements_time_filtered_one_measurement(
+    mocker, inspection_mongo_mock, data_mongo_mock_several_measurements
+):
+    # Test Request
+    api_path = API_PATH.format(inspection_id=INSPECTION_ID)
+    response = client.get(f"{api_path}?start_time={MIN_TIME}&finish_time={MIN_TIME}")
+    response_body = response.json()
+
+    # Assertions
+    assert response.status_code == 200
+    assert len(response_body.get("temperatures")) == 1
+
+
+def test_success_get_inspection_charts_100_measurements_time_filtered_half_measurements(
+    mocker, inspection_mongo_mock, data_mongo_mock_several_measurements
+):
+    # Test Request
+    api_path = API_PATH.format(inspection_id=INSPECTION_ID)
+    fiftieth_measurement_time = int(MIN_TIME + (MEASUREMENTS_PERIOD * 50 - 1))
+    response = client.get(
+        f"{api_path}?start_time={MIN_TIME}&finish_time={fiftieth_measurement_time}"
+    )
+    response_body = response.json()
+
+    # Assertions
+    assert response.status_code == 200
+    assert len(response_body.get("temperatures")) == 50
+
+
+def test_success_get_inspection_charts_100_measurements_time_filtered_without_start_time(
+    mocker, inspection_mongo_mock, data_mongo_mock_several_measurements
+):
+    # Test Request
+    api_path = API_PATH.format(inspection_id=INSPECTION_ID)
+    fiftieth_measurement_time = int(MIN_TIME + (MEASUREMENTS_PERIOD * 50 - 1))
+    response = client.get(f"{api_path}?finish_time={MAX_TIME}")
+    response_body = response.json()
+
+    # Assertions
+    assert response.status_code == 200
+    assert len(response_body.get("temperatures")) == MEASUREMENTS_COUNT
+
+
+def test_success_get_inspection_charts_100_measurements_time_filtered_without_finish_time(
+    mocker, inspection_mongo_mock, data_mongo_mock_several_measurements
+):
+    # Test Request
+    api_path = API_PATH.format(inspection_id=INSPECTION_ID)
+    fiftieth_measurement_time = int(MIN_TIME + (MEASUREMENTS_PERIOD * 50 - 1))
+    response = client.get(f"{api_path}?start_time={MIN_TIME}")
+    response_body = response.json()
+
+    # Assertions
+    assert response.status_code == 200
+    assert len(response_body.get("temperatures")) == MEASUREMENTS_COUNT
