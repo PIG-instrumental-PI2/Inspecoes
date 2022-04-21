@@ -5,6 +5,7 @@ from fastapi import APIRouter, status
 from libraries.crc_utils import CRCUtils
 from models.inspection import InspectionModel
 from schemas.inspection import InspectionCreationRequest, InspectionDeleteResponse
+from services.data_input import DataInputService
 from services.inspection import InspectionService
 from services.pig import PIGService
 
@@ -53,12 +54,15 @@ def get_inspection(inspection_id: str):
     response_model=InspectionModel,
 )
 def close_inspection(inspection_id: str):
+    """Closes an inspection and start post processing"""
     pig_service = PIGService()
+    data_service = DataInputService()
 
     inspection_record = InspectionService().get_by_id(inspection_id)
     pig_record = pig_service.get_by_id(pig_id=inspection_record.pig_id)
     pig_service.update(pig_record.id, last_inspection=None)
     inspection_record = InspectionService().close(inspection_record)
+    data_service.post_processing(inspection_id)
 
     return inspection_record
 

@@ -7,3 +7,6 @@ pytest-mock==3.6.*
 pytest-cov
 python-multipart
 crcmod
+scikit-learn==1.0.2
+pandas
+numpy

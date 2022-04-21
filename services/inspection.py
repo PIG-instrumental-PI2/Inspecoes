@@ -35,9 +35,9 @@ class InspectionService:
         return self._inspection_repository.get_by_id(inspection_id)
 
     def close(self, inspection: InspectionModel) -> InspectionModel:
-        """Closes an inspection and start post processing"""
         inspection.open = False
-        return self._inspection_repository.update(inspection)
+        updated_inspection = self._inspection_repository.update(inspection)
+        return updated_inspection
 
     def open(self, inspection: InspectionModel) -> InspectionModel:
         inspection.open = True
