@@ -1,4 +1,3 @@
-import datetime
 from typing import List
 
 from repositories.measurements import MeasurementRepository

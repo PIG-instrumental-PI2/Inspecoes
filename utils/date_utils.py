@@ -10,6 +10,10 @@ class HoursTimedelta(datetime.timedelta):
         microseconds = self.microseconds
         milliseconds = microseconds // 1000
         formatted_time_delta = "{}:{}:{}:{}".format(
-            int(hours), int(minutes), int(seconds), int(milliseconds)
+            str(int(hours)).zfill(2),
+            str(int(minutes)).zfill(2),
+            str(int(seconds)).zfill(2),
+            str(int(milliseconds)).zfill(3),
         )
+
         return formatted_time_delta
