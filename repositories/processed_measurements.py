@@ -39,4 +39,5 @@ class ProcessedMeasurementRepository:
                     clustered_magnetic_fields=record.get("clustered_magnetic_fields"),
                 )
             )
+        records = sorted(records, key=lambda record: record.ms_time)
         return records

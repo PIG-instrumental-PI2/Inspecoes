@@ -24,4 +24,5 @@ class MeasurementRepository:
                     temperature=record.get("temperature"),
                 )
             )
+        records = sorted(records, key=lambda record: record.ms_time)
         return records
