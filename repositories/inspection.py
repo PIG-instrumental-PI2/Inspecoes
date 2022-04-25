@@ -41,6 +41,7 @@ class InspectionRepository:
                     name=record.get("name"),
                     company_id=record.get("company_id"),
                     pig_id=record.get("pig_id"),
+                    pig_number=record.get("pig_number"),
                     open=record.get("open"),
                     place=record.get("place"),
                 )
@@ -66,6 +67,7 @@ class InspectionRepository:
                 name=record.get("name"),
                 company_id=record.get("company_id"),
                 pig_id=record.get("pig_id"),
+                pig_number=record.get("pig_number"),
                 open=record.get("open"),
                 place=record.get("place"),
                 description=record.get("description"),

@@ -1,6 +1,6 @@
 from typing import List
 
-from models.inspection import InspectionModel, InspectionUpdateModel
+from models.inspection import InspectionModel
 from repositories.inspection import InspectionRepository
 from utils.math_utils import format_float
 
@@ -14,6 +14,7 @@ class InspectionService:
         name: str,
         company_id: str,
         pig_id: str,
+        pig_number: str,
         place: str = None,
         description: str = None,
     ) -> InspectionModel:
@@ -21,6 +22,7 @@ class InspectionService:
             name=name,
             company_id=company_id,
             pig_id=pig_id,
+            pig_number=pig_number,
             open=True,
             place=place,
             description=description,

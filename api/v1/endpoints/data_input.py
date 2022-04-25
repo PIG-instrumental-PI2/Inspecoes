@@ -26,6 +26,7 @@ def upload_data(pig_id: str, inspection_data: bytes = File(...)):
             name="Nova inspenção (gerada automaticamente)",
             company_id=pig_record.company_id,
             pig_id=pig_record.id,
+            pig_number=pig_record.pig_number,
         )
         pig_service.update(pig_record.id, current_inspection=inspection_record.id)
 
