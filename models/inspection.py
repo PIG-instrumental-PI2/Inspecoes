@@ -16,8 +16,8 @@ class InspectionModel(BaseModel):
     clusters: Optional[List[list]]
 
     def dict(self, *args, **kwargs):
-        if kwargs and kwargs.get("exclude_none") is not None:
-            kwargs["exclude_none"] = True
+        if kwargs and kwargs.get("exclude_unset") is not None:
+            kwargs["exclude_unset"] = True
         return BaseModel.dict(self, *args, **kwargs)
 
 
