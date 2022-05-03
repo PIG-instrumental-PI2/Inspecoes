@@ -61,13 +61,13 @@ class DataInputService:
     def post_processing(self, inspection_id):
         """Peform post processing on inspection data and save on database"""
         measurements = self._measurements_repository.get_by_inspection(inspection_id)
-        clusters, clustered_magnetic_avgs_by_time = self._clustering(
+        clusters, clustered_magnetic_fields_avg = self._clustering(
             inspection_id, measurements
         )
         self._process_and_save_measurements(
             inspection_id=inspection_id,
             measurements=measurements,
-            clustered_magnetic_avgs_by_time=clustered_magnetic_avgs_by_time,
+            clustered_magnetic_fields_avg=clustered_magnetic_fields_avg,
         )
 
         return clusters
@@ -123,7 +123,7 @@ class DataInputService:
         self,
         inspection_id: str,
         measurements: List[MeasurementModel],
-        clustered_magnetic_avgs_by_time: dict,
+        clustered_magnetic_fields_avg: dict,
     ):
         current_pos = 0
         measurements_last = len(measurements) - 1
@@ -141,7 +141,7 @@ class DataInputService:
                     speed=measurement.speed,
                     magnetic_fields=measurement.magnetic_fields,
                     magnetic_fields_avg=avg(measurement.magnetic_fields),
-                    clustered_magnetic_avg=clustered_magnetic_avgs_by_time.get(
+                    clustered_magnetic_fields_avg=clustered_magnetic_fields_avg.get(
                         measurement.ms_time
                     ),
                 )

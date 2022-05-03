@@ -15,7 +15,7 @@ class ChartGroupService:
 
         temperatures = []
         speeds = []
-        clustered_magnetic_avgs = []
+        clustered_magnetic_fields_avg = []
         magnetic_fields_avg = []
         times = []
         formatted_times = []
@@ -26,7 +26,9 @@ class ChartGroupService:
             times.append(measurement.ms_time)
             speeds.append(measurement.speed)
             magnetic_fields_avg.append(measurement.magnetic_fields_avg)
-            clustered_magnetic_avgs.append(measurement.clustered_magnetic_avg)
+            clustered_magnetic_fields_avg.append(
+                measurement.clustered_magnetic_fields_avg
+            )
             formatted_times.append(measurement.formatted_time)
             positions.append(measurement.position)
 
@@ -37,7 +39,7 @@ class ChartGroupService:
             magnetic_fields_avg=magnetic_fields_avg,
             formatted_times=formatted_times,
             positions=positions,
-            clustered_magnetic_avg=clustered_magnetic_avgs,
+            clustered_magnetic_fields_avg=clustered_magnetic_fields_avg,
         )
 
     def _append_fields_into_dict(self, fields_dict: dict, fields_array: list):

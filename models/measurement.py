@@ -20,4 +20,4 @@ class ProcessedMeasurementsModel(BaseModel):
     speed: Optional[float]
     magnetic_fields: Optional[List[float]]
     magnetic_fields_avg: Optional[float]
-    clustered_magnetic_avg: Optional[int]
+    clustered_magnetic_fields_avg: Optional[int]

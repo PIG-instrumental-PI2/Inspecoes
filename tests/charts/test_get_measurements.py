@@ -90,7 +90,7 @@ def data_mongo_mock(mocker):
                     "speed": 3.7181,
                     "magnetic_fields_avg": avg(MAGNETIC_FIELDS),
                     "magnetic_fields": MAGNETIC_FIELDS,
-                    "clustered_magnetic_avg": CLUSTERED_AVG_FIELD,
+                    "clustered_magnetic_fields_avg": CLUSTERED_AVG_FIELD,
                     "temperature": 41.6044,
                     "position": 0,
                 }
@@ -115,7 +115,7 @@ def test_success_get_inspection_charts(mocker, inspection_mongo_mock, data_mongo
     assert response_body.get("times")[0] == MIN_TIME
     assert response_body.get("formatted_times")[0] == "00:03:04:201"
     assert response_body.get("clusters") == CLUSTERS
-    assert response_body.get("clustered_magnetic_avg")[0] == CLUSTERED_AVG_FIELD
+    assert response_body.get("clustered_magnetic_fields_avg")[0] == CLUSTERED_AVG_FIELD
 
 
 #################### Test several measurements ####################
@@ -147,7 +147,7 @@ def data_mongo_mock_several_measurements(mocker):
                     "speed": 3.7181,
                     "magnetic_fields_avg": avg(MAGNETIC_FIELDS),
                     "magnetic_fields": MAGNETIC_FIELDS,
-                    "clustered_magnetic_avg": CLUSTERED_AVG_FIELD,
+                    "clustered_magnetic_fields_avg": CLUSTERED_AVG_FIELD,
                     "temperature": 41.6044,
                     "position": 0,
                 }
@@ -177,7 +177,7 @@ def test_success_get_inspection_charts_100_measurements(
     assert response_body.get("times")[99] == MAX_TIME
     assert response_body.get("formatted_times")[99] == "00:03:24:001"
     assert response_body.get("clusters") == CLUSTERS
-    assert response_body.get("clustered_magnetic_avg")[99] == CLUSTERED_AVG_FIELD
+    assert response_body.get("clustered_magnetic_fields_avg")[99] == CLUSTERED_AVG_FIELD
 
 
 def test_success_get_inspection_charts_100_measurements_time_filtered_complete_list(
