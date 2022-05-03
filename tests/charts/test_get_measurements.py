@@ -37,7 +37,7 @@ MAGNETIC_FIELDS = [
     2.4646,
     2.4723,
 ]
-CLUSTERED_FIELDS = [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3]
+CLUSTERED_AVG_FIELD = 3
 CLUSTERS = [[2.4826], [2.4821], [2.4824], [2.4818], [2.4831]]
 MIN_TIME = 184201
 MEASUREMENTS_FREQUENCY = 5
@@ -90,7 +90,7 @@ def data_mongo_mock(mocker):
                     "speed": 3.7181,
                     "magnetic_fields_avg": avg(MAGNETIC_FIELDS),
                     "magnetic_fields": MAGNETIC_FIELDS,
-                    "clustered_magnetic_fields": CLUSTERED_FIELDS,
+                    "clustered_magnetic_avg": CLUSTERED_AVG_FIELD,
                     "temperature": 41.6044,
                     "position": 0,
                 }
@@ -115,13 +115,7 @@ def test_success_get_inspection_charts(mocker, inspection_mongo_mock, data_mongo
     assert response_body.get("times")[0] == MIN_TIME
     assert response_body.get("formatted_times")[0] == "00:03:04:201"
     assert response_body.get("clusters") == CLUSTERS
-    for field_index in range(16):
-        field = response_body.get(f"magnetic_fields_{field_index}")[0]
-        clustered_field = response_body.get(f"clustered_magnetic_fields_{field_index}")[
-            0
-        ]
-        assert field == MAGNETIC_FIELDS[field_index]
-        assert clustered_field == CLUSTERED_FIELDS[field_index]
+    assert response_body.get("clustered_magnetic_avg")[0] == CLUSTERED_AVG_FIELD
 
 
 #################### Test several measurements ####################
@@ -153,7 +147,7 @@ def data_mongo_mock_several_measurements(mocker):
                     "speed": 3.7181,
                     "magnetic_fields_avg": avg(MAGNETIC_FIELDS),
                     "magnetic_fields": MAGNETIC_FIELDS,
-                    "clustered_magnetic_fields": CLUSTERED_FIELDS,
+                    "clustered_magnetic_avg": CLUSTERED_AVG_FIELD,
                     "temperature": 41.6044,
                     "position": 0,
                 }
@@ -183,13 +177,7 @@ def test_success_get_inspection_charts_100_measurements(
     assert response_body.get("times")[99] == MAX_TIME
     assert response_body.get("formatted_times")[99] == "00:03:24:001"
     assert response_body.get("clusters") == CLUSTERS
-    for field_index in range(16):
-        field = response_body.get(f"magnetic_fields_{field_index}")[99]
-        clustered_field = response_body.get(f"clustered_magnetic_fields_{field_index}")[
-            99
-        ]
-        assert field == MAGNETIC_FIELDS[field_index]
-        assert clustered_field == CLUSTERED_FIELDS[field_index]
+    assert response_body.get("clustered_magnetic_avg")[99] == CLUSTERED_AVG_FIELD
 
 
 def test_success_get_inspection_charts_100_measurements_time_filtered_complete_list(
