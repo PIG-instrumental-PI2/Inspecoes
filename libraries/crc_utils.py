@@ -16,8 +16,6 @@ crcmod.__doc__
 class CRCUtils:
     @staticmethod
     def encode_data(data: bytes) -> bytes:
-        # crc32 = binascii.crc32(data)
-        # crc_value = CRCUtils.int_to_bytes(crc32, 32)
         crc16 = crcmod.predefined.Crc(CRC16_VARIATION)
         crc16.update(data)
         crc_value = CRCUtils.int_to_bytes(crc16.crcValue, CRC_SIZE)
@@ -32,7 +30,6 @@ class CRCUtils:
 
     @staticmethod
     def check_integrity(data: bytes, crc: int):
-        # crc32_temp = binascii.crc32(data)
         crc16 = crcmod.predefined.Crc(CRC16_VARIATION)
         crc16.update(data)
         crc16_temp = crc16.crcValue

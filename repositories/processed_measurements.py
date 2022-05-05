@@ -36,7 +36,9 @@ class ProcessedMeasurementRepository:
                     speed=record.get("speed"),
                     magnetic_fields=record.get("magnetic_fields"),
                     magnetic_fields_avg=record.get("magnetic_fields_avg"),
-                    clustered_magnetic_fields=record.get("clustered_magnetic_fields"),
+                    clustered_magnetic_fields_avg=record.get(
+                        "clustered_magnetic_fields_avg"
+                    ),
                 )
             )
         records = sorted(records, key=lambda record: record.ms_time)
